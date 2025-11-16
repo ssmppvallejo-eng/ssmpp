@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Answer {
+  idAnswer                 Int                        @id @default(autoincrement())
+  description              String
+  idIndicator              Int
+  Indicator                Indicator                  @relation(fields: [idIndicator], references: [idIndicator])
+  AssigmentIndicatorAnswer AssigmentIndicatorAnswer[]
+}
+
+model Assigment {
+  idAssigment        Int                  @id @default(autoincrement())
+  idUserOwner        Int
+  assignmentDate     DateTime?
+  submissionDate     DateTime?
+  status             IndicatorStatus      @default(PENDIENTE)
+  User               User                 @relation(fields: [idUserOwner], references: [idUser])
+  AssigmentIndicator AssigmentIndicator[]
+  UserAssignTo       UserAssignTo[]
+}
+
+model AssigmentIndicator {
+  idAssigmentIndicator     Int                        @id @default(autoincrement())
+  idIndicator              Int
+  idAssigment              Int
+  Assigment                Assigment                  @relation(fields: [idAssigment], references: [idAssigment])
+  Indicator                Indicator                  @relation(fields: [idIndicator], references: [idIndicator])
+  AssigmentIndicatorAnswer AssigmentIndicatorAnswer[]
+}
+
+model AssigmentIndicatorAnswer {
+  idAssigmentIndicator Int
+  idAnswer             Int
+  value                Int?
+  note                 String?
+  evidenceName         String?
+  urlEvidence          String?
+  complete             Boolean            @default(false)
+  Answer               Answer             @relation(fields: [idAnswer], references: [idAnswer])
+  AssigmentIndicator   AssigmentIndicator @relation(fields: [idAssigmentIndicator], references: [idAssigmentIndicator])
+
+  @@id([idAssigmentIndicator, idAnswer])
+}
+
+model Component {
+  idComponent     Int         @id @default(autoincrement())
+  indicatorNumber String      @unique
+  title           String
+  description     String?
+  idSubsystem     Int
+  Subsystem       Subsystem   @relation(fields: [idSubsystem], references: [idSubsystem])
+  Judgement       Judgement[]
+}
+
+model Indicator {
+  idIndicator        Int                  @id @default(autoincrement())
+  indicatorNumber    String               @unique
+  description        String
+  idJudgement        Int
+  Answer             Answer[]
+  AssigmentIndicator AssigmentIndicator[]
+  Judgement          Judgement            @relation(fields: [idJudgement], references: [idJudgement])
+  TemplateIndicator  TemplateIndicator[]
+}
+
+model Judgement {
+  idJudgement     Int         @id @default(autoincrement())
+  indicatorNumber String      @unique
+  title           String
+  description     String?
+  idComponent     Int
+  Indicator       Indicator[]
+  Component       Component   @relation(fields: [idComponent], references: [idComponent])
+}
+
+model Posgraduate {
+  idPosgraduate    Int               @id @default(autoincrement())
+  level            Level
+  knowledgeArea    Area
+  posgraduateTitle String
+  Template         Template[]
+  UserPosgraduate  UserPosgraduate[]
+}
+
+model Subsystem {
+  idSubsystem     Int         @id @default(autoincrement())
+  indicatorNumber String      @unique
+  title           String
+  description     String?
+  Component       Component[]
+}
+
+model Template {
+  idTemplate          Int                 @id @default(autoincrement())
+  nameTemplate        String
+  descriptionTemplate String?
+  idPosgraduate       Int
+  Posgraduate         Posgraduate         @relation(fields: [idPosgraduate], references: [idPosgraduate])
+  TemplateIndicator   TemplateIndicator[]
+}
+
+model TemplateIndicator {
+  idTemplate  Int
+  idIndicator Int
+  Indicator   Indicator @relation(fields: [idIndicator], references: [idIndicator])
+  Template    Template  @relation(fields: [idTemplate], references: [idTemplate])
+
+  @@id([idTemplate, idIndicator])
+}
+
+model User {
+  idUser          Int               @id @default(autoincrement())
+  email           String            @unique
+  imgUser         String?
+  userName        String?
+  role            Role              @default(ESTUDIANTE)
+  valid           Boolean           @default(false)
+  Assigment       Assigment[]
+  UserAssignTo    UserAssignTo[]
+  UserPosgraduate UserPosgraduate[]
+}
+
+model UserAssignTo {
+  idAssigment Int
+  idUser      Int
+  Assigment   Assigment @relation(fields: [idAssigment], references: [idAssigment])
+  User        User      @relation(fields: [idUser], references: [idUser])
+
+  @@id([idAssigment, idUser])
+}
+
+model UserPosgraduate {
+  idUser        Int
+  idPosgraduate Int
+  Posgraduate   Posgraduate @relation(fields: [idPosgraduate], references: [idPosgraduate])
+  User          User        @relation(fields: [idUser], references: [idUser])
+
+  @@id([idUser, idPosgraduate])
+}
+
+enum Area {
+  CIENCIAS_EXACTAS
+  CIENCIAS_NATURALES_Y_AGROPECUARIAS
+  CIENCIAS_DE_LA_SALUD
+  CIENCIAS_DE_LA_EDUCACION_Y_HUMANIDADES
+  CIENCIAS_SOCIALES_Y_ADMINISTRATIVAS
+  INGENIERIA_Y_TECNOLOGIAS
+}
+
+enum IndicatorStatus {
+  PENDIENTE
+  EN_PROCESO
+  ENVIADO
+  EN_REVISION
+  COMPLETADO
+}
+
+enum Level {
+  ESPECIALIDADES
+  MAESTRIAS
+  DOCTORADOS
+  ESPECIALIDADES_MEDICAS
+}
+
+enum Role {
+  ADMINISTRADOR
+  ESTUDIANTE
+  COORDINADOR
+  PROFESOR
+  EVALUADOR
+}
