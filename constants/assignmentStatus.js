@@ -5,3 +5,7 @@ export const ASSIGNMENT_STATUS = Object.freeze({
     EN_REVISION: 'EN_REVISION',
     COMPLETADO: 'COMPLETADO'
 });
+
+export const SYSTEM_ROLES = Object.freeze({
+    ESTUDIANTE: 'ESTUDIANTE',
+});

@@ -26,7 +26,7 @@ export default  function AssignmentPage () {
     }, []);
 
     useEffect(() => {
-        console.log(activity);
+        console.log("Activity",activity);
     }, [activity]);
 
 

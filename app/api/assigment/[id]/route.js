@@ -1,6 +1,7 @@
 import { prisma } from '../../../../lib/prima';
 import { authOptions } from '../../../../lib/auth';
 import { getServerSession } from 'next-auth';
+import { SYSTEM_ROLES } from '../../../../constants/assignmentStatus';
 
 
 
@@ -13,7 +14,6 @@ export async function GET (request, context) {
 
     try{
         const session = await getServerSession(authOptions);
-        
         if (!session) {
             return new Response(
                 JSON.stringify({ message: "Unauthorized" }),
@@ -23,6 +23,8 @@ export async function GET (request, context) {
                 }
             );
         }
+
+        console.log("Session user:", session);
 
         const isMyActivity = await prisma.userAssignTo.findUnique({
                 where: {
@@ -170,3 +172,75 @@ export async function GET (request, context) {
         );
     }
 }
+
+export async function POST (request){
+    const body = await request.json();
+    
+    const session = await getServerSession(authOptions);
+    try{
+        if (!session){
+            return new Response(
+                JSON.stringify({message: "Unauthorized"}),{
+                    status:401,
+                    headers:{"Content-Type":"application/json"}
+                }
+            );
+        }
+
+        switch(session.user.role){
+            case SYSTEM_ROLES.ESTUDIANTE:
+                
+            default:
+            return new Response(
+                JSON.stringify({message: "Forbidden"}),{
+                    status:403,
+                    headers:{"Content_type":"application/json"}
+                } 
+            );
+        }
+
+    }catch(error){
+        console.error("Error at posting assignments:", error);
+        return new Response(
+            JSON.stringify({
+                error:"Error interno del servidor",
+                details: error.message
+            }),
+            {
+                status:500,
+                headers:{"Content-Type":"application/json"}
+            }
+        );
+    }
+
+}
+
+async function postStudentAssignment(body){
+
+    const optionalData ={
+        ...(body.comment !== undefined && {comment:body.comment}),
+    };
+
+    const descriptor = await  prisma.assignmentIndicatorDescriptor.upsert({
+        where: {
+            descriptor_answer_id:{
+                assignmentIndicatorId: body.assignmentIndicatorId,
+                descriptorId: body.descriptorId,
+            },
+        },
+        create:{
+            ...optionalData,
+            assignmentIndicatorId: body.assignmentIndicatorId,
+            descriptorId: body.descriptorId,
+            valueAssigned: body.valueAssigned,
+
+        },
+        update:{
+            ...optionalData,
+            descriptorId: body.descriptorId,
+            valueAssigned: body.valueAssigned,
+        }
+    });
+
+    return descriptor;
+};

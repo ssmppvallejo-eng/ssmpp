@@ -4,17 +4,19 @@ import { useState } from "react";
 import { BsCaretDown, BsCaretUp } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
 import { useReducer } from "react";
+import { useActivity } from "../../../providers/ActivitiesProvider";
 
 
 export default function Indicator ({ind}){
-    
+
+    const { assignmentState, assignmentDispatch} = useActivity();
 
     const [dropRubric, setDropRubric] = useState(true);
     const toggleAll = ()=>{
         setDropRubric(prev => !prev);
     }
-
-
+    console.log(`Indi`, ind);
+    console.log(`assign`, assignmentState);
     return( 
         <article className="flex flex-col   gap-3 pt-4 md:pt-0 ">
 
@@ -40,13 +42,15 @@ export default function Indicator ({ind}){
                     </button>
                 </article>
 
-                <article className="flex gap-4 flex-1 justify-between items-start mt-6">
+                <article className="flex gap-4 flex-1 justify-between mt-6">
                     {   
+                        ind.descriptors?.length > 0 && 
                         ind.descriptors.map(d=>
-                            <Descriptor key={d.id} descriptor={d}  dropRubric={dropRubric}/> 
+                            <Descriptor key={d.id} descriptor={d}  dropRubric={dropRubric}
+                                indicatorId={ind.id} selected={assignmentState.descriptors?.[ind.id]?.descriptorId===d.id} dispatch={assignmentDispatch}
+                            /> 
                         )
                     }
-
                 </article>
 
                 <article className="mt-8">

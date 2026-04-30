@@ -49,6 +49,7 @@ model AssignmentIndicatorDescriptor {
   valueAssigned                 Int
   evaluationValue Int?
   note                  String?
+  commment  String?
   evidenceName          String?
   evidenceUrl           String?
   addComment  Boolean @default(false)
@@ -57,8 +58,8 @@ model AssignmentIndicatorDescriptor {
 
   descriptor                Descriptor              @relation(fields: [descriptorId], references: [id])
   assignmentIndicator   AssignmentIndicator @relation(fields: [assignmentIndicatorId], references: [id])
-
-  @@id([assignmentIndicatorId, descriptorId])
+  
+  @@unique(fields: [assignmentIndicatorId,descriptorId], name:"descriptor_answer_id")
 }
 
 model Component {

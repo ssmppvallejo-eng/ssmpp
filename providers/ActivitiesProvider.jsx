@@ -14,9 +14,7 @@ export const useActivity = () => {
 };
 
 export const  ActivityProvider = ({children}) =>{
-
-
-
+    // Fetching info that describes activites
     const [preActivities, setPreActivities] = useState([]);
     const [loadingPreActivites, setLoadingPreActivities] = useState(false);
 
@@ -39,14 +37,52 @@ export const  ActivityProvider = ({children}) =>{
         }
     },[]);
 
+    const initialStateAss = {
+        descriptors:{},
+        status: ASSIGNMENT_STATUS.PENDIENTE,
+    };
+
+    const assignmentReducer = (state, action)=>{
+        switch(action.type){
+            case 'INIT_ASSIGNMENT':
+            return{
+                ...state,
+                ...action.payload,
+            }
+            case 'SET_DESCRIPTOR':
+            return{
+                ...state,
+                descriptors:{
+                    ...state.descriptors,
+                    [action.payload.assignmentIndicatorId]:{
+                        assignmentIndicatorId: action.payload.assignmentIndicatorId,
+                        descriptorId: action.payload.descriptorId,
+                        valueAssigned: action.payload.valueAssigned
+                    }
+                
+                }
+            }
+            case "SET_COMMENT":
+            return{
+                ...state,
+                descriptors:{
+                    ...state.descriptors, 
+                    [action.payload.assignmentIndicatorId]:{
+                        ...state.descriptors.[action.payload.assignmentIndicatorId],
+                        comment:action.payload.comment
+                    }
+                }
+            }
+            default:
+            return state;
+
+        }
+    };
+    const [assignmentState, assignmentDispatch]= useReducer (assignmentReducer,initialStateAss);
+
     const [activity, setActivity] = useState({});
     const [loadingActivity, setLoadingActivity] = useState(false);
     
-    const initial_state = {
-        answer:{},
-        status: ASSIGNMENT_STATUS.PENDIENTE 
-    };
-
     const fetchActivity = useCallback(async(actNumber)=>{
         setLoadingActivity(true);
 
@@ -54,6 +90,26 @@ export const  ActivityProvider = ({children}) =>{
             const request = `/api/assigment/${actNumber}`;
             const response = await fetch(request);
             const data = await response.json();
+
+            const fillState = {
+                descriptors:{},
+                status: ASSIGNMENT_STATUS.PENDIENTE,
+            };
+
+            data.Judgement.forEach((j)=>{
+                fillState.descriptors[j.id]={
+                    assignmentIndicatorId: null, 
+                    descriptorId: null,
+                    valueAssigned: null,
+                };
+            });
+
+            assignmentDispatch({
+                type: 'INIT_ASSIGNMENT',
+                payload: fillState,
+            })
+
+            console.log("INITIAL STATE: ",initialStateAss);
 
             setActivity(data);
 
@@ -66,30 +122,16 @@ export const  ActivityProvider = ({children}) =>{
     });
 
 
-
-    const assignmentReducer = (state, action)=>{
-        switch(action.type){
-           case 'SET_INDICATOR':
-    return {
-        ...state,
-        answer: {
-            ...state.answer,
-            [state.payload.id]: {
-                id: state.payload.id
-            }
-        }
-    };
-
-        }
-    };
-
     const value ={
         preActivities,
         fetchPreActivities,
         loadingPreActivites,
         loadingActivity,
         activity,
-        fetchActivity
+        fetchActivity,
+        // Reducer for assignment form
+        assignmentState,
+        assignmentDispatch
     };
     return (
         <ActivityContext.Provider value={value}>
