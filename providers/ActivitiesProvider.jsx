@@ -68,7 +68,7 @@ export const  ActivityProvider = ({children}) =>{
                 descriptors:{
                     ...state.descriptors, 
                     [action.payload.assignmentIndicatorId]:{
-                        ...state.descriptors.[action.payload.assignmentIndicatorId],
+                        ...state.descriptors[action.payload.assignmentIndicatorId],
                         comment:action.payload.comment
                     }
                 }
@@ -97,11 +97,13 @@ export const  ActivityProvider = ({children}) =>{
             };
 
             data.Judgement.forEach((j)=>{
-                fillState.descriptors[j.id]={
-                    assignmentIndicatorId: null, 
-                    descriptorId: null,
-                    valueAssigned: null,
-                };
+                j.Indicators.forEach((i)=>{
+                        fillState.descriptors[i.id]={
+                        assignmentIndicatorId: null, 
+                        descriptorId: null,
+                        valueAssigned: null,
+                    };
+                })
             });
 
             assignmentDispatch({
@@ -109,7 +111,7 @@ export const  ActivityProvider = ({children}) =>{
                 payload: fillState,
             })
 
-            console.log("INITIAL STATE: ",initialStateAss);
+            //console.log("INITIAL STATE: ",initialStateAss);
 
             setActivity(data);
 

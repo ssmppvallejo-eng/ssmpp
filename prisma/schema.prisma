@@ -8,143 +8,128 @@ datasource db {
 }
 
 model Descriptor {
-  id              Int       @id @default(autoincrement())
-  title String
-  value Int
-  description     String
-  indicatorId     Int
-  indicator       Indicator @relation(fields: [indicatorId], references: [id])
+  id                             Int                             @id @default(autoincrement())
+  title                          String
+  value                          Int
+  description                    String
+  indicatorId                    Int
   assignmentIndicatorDescriptors AssignmentIndicatorDescriptor[]
+  indicator                      Indicator                       @relation(fields: [indicatorId], references: [id])
 }
 
 model Assignment {
-  id            Int        @id @default(autoincrement())
-  ownerId       Int
-  dimensionId   Int
+  id             Int                   @id @default(autoincrement())
+  ownerId        Int
   assignmentDate DateTime?
   submissionDate DateTime?
-  status        IndicatorStatus @default(PENDIENTE)
-
-  owner         User       @relation(fields: [ownerId], references: [id])
-  dimension     Dimension  @relation(fields: [dimensionId], references: [id])
-
-  indicators    AssignmentIndicator[]
-  assignedUsers UserAssignTo[]
+  status         IndicatorStatus       @default(PENDIENTE)
+  dimensionId    Int
+  dimension      Dimension             @relation(fields: [dimensionId], references: [id])
+  owner          User                  @relation(fields: [ownerId], references: [id])
+  indicators     AssignmentIndicator[]
+  assignedUsers  UserAssignTo[]
 }
 
 model AssignmentIndicator {
-  id            Int        @id @default(autoincrement())
-  indicatorId   Int
-  assignmentId  Int
-  
-  assignment    Assignment @relation(fields: [assignmentId], references: [id])
-  indicator     Indicator  @relation(fields: [indicatorId], references: [id])
-
-  descriptorAssignments       AssignmentIndicatorDescriptor[]
+  id                    Int                             @id @default(autoincrement())
+  indicatorId           Int
+  assignmentId          Int
+  assignment            Assignment                      @relation(fields: [assignmentId], references: [id])
+  indicator             Indicator                       @relation(fields: [indicatorId], references: [id])
+  descriptorAssignments AssignmentIndicatorDescriptor[]
 }
 
 model AssignmentIndicatorDescriptor {
   assignmentIndicatorId Int
-  descriptorId              Int
-  valueAssigned                 Int
-  evaluationValue Int?
+  descriptorId          Int
+  valueAssigned         Int
+  evaluationValue       Int?
   note                  String?
-  commment  String?
   evidenceName          String?
   evidenceUrl           String?
-  addComment  Boolean @default(false)
-  addEvidence Boolean @default(false)
-  complete              Boolean @default(false)
-
-  descriptor                Descriptor              @relation(fields: [descriptorId], references: [id])
+  addComment            Boolean             @default(false)
+  addEvidence           Boolean             @default(false)
+  complete              Boolean             @default(false)
+  id                    Int                 @id @default(autoincrement())
+  commment              String?
   assignmentIndicator   AssignmentIndicator @relation(fields: [assignmentIndicatorId], references: [id])
-  
-  @@unique(fields: [assignmentIndicatorId,descriptorId], name:"descriptor_answer_id")
+  descriptor            Descriptor          @relation(fields: [descriptorId], references: [id])
 }
 
 model Component {
-  id           Int       @id @default(autoincrement())
-  code         String    @unique
-  title        String
-  description  String?
-  dimensionId  Int
-
-  dimension    Dimension @relation(fields: [dimensionId], references: [id])
-  judgements   Judgement[]
+  title       String
+  description String?
+  code        String      @unique
+  id          Int         @id @default(autoincrement())
+  dimensionId Int
+  dimension   Dimension   @relation(fields: [dimensionId], references: [id])
+  judgements  Judgement[]
 }
 
 model Indicator {
-  id             Int       @id @default(autoincrement())
-  code           String    @unique
-  description    String
-  judgementId    Int
-
-  judgement      Judgement @relation(fields: [judgementId], references: [id])
-
-  descriptors        Descriptor[]
-  assignments    AssignmentIndicator[]
-  templates      TemplateIndicator[]
+  description String
+  code        String                @unique
+  id          Int                   @id @default(autoincrement())
+  judgementId Int
+  assignments AssignmentIndicator[]
+  descriptors Descriptor[]
+  judgement   Judgement             @relation(fields: [judgementId], references: [id])
+  templates   TemplateIndicator[]
 }
 
 model Judgement {
-  id          Int       @id @default(autoincrement())
-  code        String    @unique
   title       String
   description String?
+  code        String      @unique
   componentId Int
-
-  component   Component @relation(fields: [componentId], references: [id])
+  id          Int         @id @default(autoincrement())
   indicators  Indicator[]
+  component   Component   @relation(fields: [componentId], references: [id])
 }
 
 model Postgraduate {
-  id              Int       @id @default(autoincrement())
-  level           Level
-  knowledgeArea   Area
-  title           String
-
-  templates       Template[]
-  users           UserPostgraduate[]
+  id            Int                @id @default(autoincrement())
+  level         Level
+  knowledgeArea Area
+  title         String
+  templates     Template[]
+  users         UserPostgraduate[]
 }
 
 model Dimension {
-  id          Int       @id @default(autoincrement())
-  code        String    @unique
+  id          Int          @id @default(autoincrement())
+  code        String       @unique
   title       String
   description String?
-
-  components  Component[]
   assignments Assignment[]
+  components  Component[]
 }
 
 model Template {
-  id            Int       @id @default(autoincrement())
-  name          String
-  description   String?
+  description    String?
+  id             Int                 @id @default(autoincrement())
+  name           String
   postgraduateId Int
-
-  postgraduate  Postgraduate @relation(fields: [postgraduateId], references: [id])
-  indicators    TemplateIndicator[]
+  postgraduate   Postgraduate        @relation(fields: [postgraduateId], references: [id])
+  indicators     TemplateIndicator[]
 }
 
 model TemplateIndicator {
-  templateId  Int
   indicatorId Int
-
-  template    Template  @relation(fields: [templateId], references: [id])
+  templateId  Int
   indicator   Indicator @relation(fields: [indicatorId], references: [id])
+  template    Template  @relation(fields: [templateId], references: [id])
 
   @@id([templateId, indicatorId])
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
+  email         String             @unique
+  role          Role               @default(ESTUDIANTE)
+  active        Boolean            @default(false)
+  id            Int                @id @default(autoincrement())
   image         String?
   name          String?
-  role          Role     @default(ESTUDIANTE)
-  active        Boolean  @default(false)
-
   assignments   Assignment[]
   assignedTo    UserAssignTo[]
   postgraduates UserPostgraduate[]
@@ -153,7 +138,6 @@ model User {
 model UserAssignTo {
   assignmentId Int
   userId       Int
-
   assignment   Assignment @relation(fields: [assignmentId], references: [id])
   user         User       @relation(fields: [userId], references: [id])
 
@@ -163,9 +147,8 @@ model UserAssignTo {
 model UserPostgraduate {
   userId         Int
   postgraduateId Int
-
-  user           User         @relation(fields: [userId], references: [id])
   postgraduate   Postgraduate @relation(fields: [postgraduateId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
 
   @@id([userId, postgraduateId])
 }
@@ -201,4 +184,3 @@ enum Role {
   PROFESOR
   EVALUADOR
 }
-

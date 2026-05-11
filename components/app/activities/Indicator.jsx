@@ -1,22 +1,50 @@
-"use state";
+"use client";
 import Descriptor from "./Descriptor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsCaretDown, BsCaretUp } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
-import { useReducer } from "react";
 import { useActivity } from "../../../providers/ActivitiesProvider";
+import useDebounce from "../../../hooks/useDebounce";
 
 
 export default function Indicator ({ind}){
 
     const { assignmentState, assignmentDispatch} = useActivity();
+    
 
     const [dropRubric, setDropRubric] = useState(true);
     const toggleAll = ()=>{
         setDropRubric(prev => !prev);
     }
-    console.log(`Indi`, ind);
-    console.log(`assign`, assignmentState);
+    const [comment, setComment] = useState('');
+    const debounceComment = useDebounce(comment,1200);
+
+    const handleChange = (event)=>{
+        setComment(event.target.value);
+    }
+    
+
+    useEffect(()=>{
+        if(!debounceComment) return;
+
+        const apiData = {
+            assignmentIndicatorId: assignmentState.descriptors[ind.id].assignmentIndicatorId,
+            descriptorId: assignmentState.descriptors[ind.id].descriptorId,
+            valueAssigned: assignmentState.descriptors[ind.id].valueAssigned,
+            comment: debounceComment
+        }
+
+        assignmentDispatch({
+            type:"SET_COMMENT",
+            payload:{
+                assignmentIndicatorId:ind.id,
+                comment: debounceComment
+            }
+        });
+        
+        console.log(apiData);
+    },[debounceComment]);
+
     return( 
         <article className="flex flex-col   gap-3 pt-4 md:pt-0 ">
 
@@ -74,6 +102,7 @@ export default function Indicator ({ind}){
                                 focus:border-2
                                 focus:border-blue-500
                             "
+                            onChange={handleChange}
                             placeholder="Aquí su respuesta"
                         />
 

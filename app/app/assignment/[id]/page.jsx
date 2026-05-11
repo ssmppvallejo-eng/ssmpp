@@ -25,11 +25,6 @@ export default  function AssignmentPage () {
         fetchActivity(id);
     }, []);
 
-    useEffect(() => {
-        console.log("Activity",activity);
-    }, [activity]);
-
-
     return(
         <div className="p-6 ">
             {
