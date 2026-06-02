@@ -9,7 +9,7 @@ export default function LayoutContent({ children }) {
     return (
         <div className="flex min-h-screen">
             {visibleNav &&
-            <div className="w-fit border-r-2">
+            <div className="w-fit">
                 <Navbar />
             </div>
             }

@@ -1,14 +1,42 @@
+"use client";
+import { useEffect, useState } from "react";
+import useDebounce from "../../../hooks/useDebounce";
+
+
 export default function Descriptor({ descriptor, dropRubric, indicatorId, selected, dispatch }) {
+    const [option, setOption] = useState({});
+    const debounceDescriptor = useDebounce(option,2000);
+
+    const handleClick = ()=>{
+        setOption(
+            {
+                assignmentIndicatorId:indicatorId,
+                descriptorId: descriptor.id, 
+                valueAssigned: descriptor.value,
+            }
+        );
+
+        dispatch({
+            type: "SET_DESCRIPTOR",
+            payload: {
+                assignmentIndicatorId:indicatorId,
+                descriptorId: descriptor.id, 
+                valueAssigned: descriptor.value,
+            }
+        });
+    }
+
+    useEffect(()=>{
+        if(!debounceDescriptor) return;
+        
+        const apiData = debounceDescriptor;
+
+        console.log(apiData);
+
+    },[debounceDescriptor]);
 
     return(
-        <article onClick={()=>dispatch({
-                type: "SET_DESCRIPTOR",
-                payload: {
-                    assignmentIndicatorId:indicatorId,
-                    descriptorId: descriptor.id, 
-                    valueAssigned: descriptor.value,
-                }
-            })}
+        <article onClick={handleClick}
             className={`
                 p-2 pr-6 md:pl-6 mb-2 md:mb-0 rounded-2xl w-full md:w-1/4
                 ring-2 transition-all 
