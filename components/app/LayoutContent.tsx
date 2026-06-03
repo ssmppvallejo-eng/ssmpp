@@ -7,18 +7,16 @@ export default function LayoutContent({ children }) {
     const { visibleNav } = useStyle();
 
     return (
-        <div className="flex min-h-screen">
+        <div className="min-h-screen bg-stone-50 text-zinc-950 lg:flex">
             {visibleNav &&
-            <div className="w-fit">
                 <Navbar />
-            </div>
             }
 
-            <div className="flex-1 pl-1 pt-1">
+            <main className="min-w-0 flex-1">
                 <ActivityProvider>
                     {children}
                 </ActivityProvider>
-            </div>
+            </main>
         </div>
     );
 }

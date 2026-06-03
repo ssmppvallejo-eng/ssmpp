@@ -36,29 +36,34 @@ export default function Descriptor({ descriptor, dropRubric, indicatorId, select
     },[debounceDescriptor]);
 
     return(
-        <article onClick={handleClick}
+        <button
+            type="button"
+            onClick={handleClick}
             className={`
-                p-2 pr-6 md:pl-6 mb-2 md:mb-0 rounded-2xl w-full md:w-1/4
-                ring-2 transition-all 
+                min-h-28 w-full rounded-md border p-4 text-left transition
                 ${selected 
-                ? "bg-blue-100 ring-blue-600" 
-                : "bg-gray-100/70 md:bg-white ring-blue-600/60 hover:bg-blue-600/5"}
+                ? "border-sky-700 bg-sky-50 shadow-sm" 
+                : "border-zinc-200 bg-white hover:border-sky-300 hover:bg-sky-50/40"}
             `}
-        >      
-            <article className="flex justify-between md:items-center ">
-                <p className="font-semibold">
+        >
+            <article className="flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold leading-6 text-zinc-950">
                     {descriptor.title}
                 </p>
-
+                <span className={`grid size-6 shrink-0 place-items-center rounded-full border text-xs font-semibold ${
+                    selected ? "border-sky-700 bg-sky-700 text-white" : "border-zinc-300 text-zinc-500"
+                }`}>
+                    {descriptor.value}
+                </span>
             </article>
             {
                 dropRubric &&
-                <article className="text-sm mt-2">
+                <p className="mt-3 text-sm leading-6 text-zinc-600">
                     {descriptor.description}
-                </article>
+                </p>
 
             }
-        </article>
+        </button>
 
     );
 
