@@ -63,6 +63,9 @@ export const  ActivityProvider = ({children}) =>{
                 }
             }
             case "SET_COMMENT":
+            if (state.descriptors[action.payload.assignmentIndicatorId]?.comment === action.payload.comment) {
+                return state;
+            }
             return{
                 ...state,
                 descriptors:{
@@ -121,7 +124,7 @@ export const  ActivityProvider = ({children}) =>{
         finally{
             setLoadingActivity(false);
         }
-    });
+    }, []);
 
 
     const value ={

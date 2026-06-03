@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, createContext, useState } from "react";
+import { useCallback, useContext, createContext, useState } from "react";
 const StyleContext= createContext();
 
 export const useStyle = () =>{
@@ -16,13 +16,13 @@ export const useStyle = () =>{
 export const StyleProvider = ({children}) =>{
     const [visibleNav, setVisibleNav] = useState(true);
 
-    const hiddeNav = () =>{
+    const hiddeNav = useCallback(() =>{
         setVisibleNav(false);
-    };
+    }, []);
 
-    const showNav = ()=>{
+    const showNav = useCallback(()=>{
         setVisibleNav(true);
-    };
+    }, []);
 
     const value ={
         visibleNav,
