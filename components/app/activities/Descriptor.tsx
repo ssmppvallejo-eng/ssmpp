@@ -1,41 +1,53 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useDebounce from "../../../hooks/useDebounce";
+import { Descriptor as DescriptorType } from "../../../src/core/domain/entities/Activities";
+import { useActivity } from "../../../providers/ActivitiesProvider";
 
+interface DescriptorProps {
+    descriptor: DescriptorType;
+    dropRubric: boolean;
+    indicatorId: number;
+    selected: boolean;
+    dispatch: any; // We could type this better if we wanted to
+}
 
-export default function Descriptor({ descriptor, dropRubric, indicatorId, selected, dispatch }) {
-    const [option, setOption] = useState({});
-    const debounceDescriptor = useDebounce(option,2000);
+export default function Descriptor({ descriptor, dropRubric, indicatorId, selected, dispatch }: DescriptorProps) {
+    const { saveResponse, assignmentState } = useActivity();
+    const [option, setOption] = useState<any>(null);
+    const debounceDescriptor = useDebounce(option, 2000);
 
-    const handleClick = ()=>{
-        setOption(
-            {
-                assignmentIndicatorId:indicatorId,
-                descriptorId: descriptor.id, 
-                valueAssigned: descriptor.value,
-            }
-        );
+    const handleClick = () => {
+        const payload = {
+            assignmentIndicatorId: indicatorId,
+            descriptorId: descriptor.id,
+            valueAssigned: descriptor.value,
+        };
+        
+        setOption(payload);
 
         dispatch({
             type: "SET_DESCRIPTOR",
-            payload: {
-                assignmentIndicatorId:indicatorId,
-                descriptorId: descriptor.id, 
-                valueAssigned: descriptor.value,
-            }
+            payload
         });
     }
 
-    useEffect(()=>{
-        if(!debounceDescriptor) return;
+    useEffect(() => {
+        if (!debounceDescriptor) return;
         
-        const apiData = debounceDescriptor;
+        // Get the current comment from state if it exists
+        const currentComment = assignmentState.descriptors[indicatorId]?.comment;
 
-        console.log(apiData);
+        saveResponse(
+            debounceDescriptor.assignmentIndicatorId,
+            debounceDescriptor.descriptorId,
+            debounceDescriptor.valueAssigned,
+            currentComment || undefined
+        );
 
-    },[debounceDescriptor]);
+    }, [debounceDescriptor, indicatorId, saveResponse, assignmentState.descriptors]);
 
-    return(
+    return (
         <button
             type="button"
             onClick={handleClick}
@@ -61,10 +73,7 @@ export default function Descriptor({ descriptor, dropRubric, indicatorId, select
                 <p className="mt-3 text-sm leading-6 text-zinc-600">
                     {descriptor.description}
                 </p>
-
             }
         </button>
-
     );
-
 }
