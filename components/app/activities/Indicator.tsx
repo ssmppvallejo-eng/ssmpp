@@ -1,52 +1,54 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import Descriptor from "./Descriptor";
-import { useEffect, useState } from "react";
 import { FiChevronDown, FiChevronUp, FiFileText, FiMessageSquare } from "react-icons/fi";
 import { useActivity } from "../../../providers/ActivitiesProvider";
 import useDebounce from "../../../hooks/useDebounce";
+import { Indicator as IndicatorType } from "../../../src/core/domain/entities/Activities";
 
+interface IndicatorProps {
+    ind: IndicatorType;
+}
 
-export default function Indicator ({ind}){
-
-    const { assignmentState, assignmentDispatch} = useActivity();
+export default function Indicator({ ind }: IndicatorProps) {
+    const { assignmentState, assignmentDispatch, saveResponse } = useActivity();
     const descriptorState = assignmentState.descriptors[ind.id];
-    
 
     const [dropRubric, setDropRubric] = useState(true);
-    const toggleAll = ()=>{
+    const toggleAll = () => {
         setDropRubric(prev => !prev);
     }
     const [comment, setComment] = useState('');
-    const debounceComment = useDebounce(comment,1200);
+    const debounceComment = useDebounce(comment, 1200);
 
-    const handleChange = (event)=>{
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setComment(event.target.value);
     }
-    
 
-    useEffect(()=>{
-        if(!debounceComment) return;
-        if(!descriptorState) return;
-
-        const apiData = {
-            assignmentIndicatorId: descriptorState.assignmentIndicatorId,
-            descriptorId: descriptorState.descriptorId,
-            valueAssigned: descriptorState.valueAssigned,
-            comment: debounceComment
-        }
+    useEffect(() => {
+        if (!debounceComment) return;
+        if (!descriptorState) return;
 
         assignmentDispatch({
-            type:"SET_COMMENT",
-            payload:{
-                assignmentIndicatorId:ind.id,
+            type: "SET_COMMENT",
+            payload: {
+                assignmentIndicatorId: ind.id,
                 comment: debounceComment
             }
         });
-        
-        console.log(apiData);
-    },[assignmentDispatch, debounceComment, descriptorState, ind.id]);
 
-    return(
+        // Trigger save whenever comment changes, including the selected descriptor
+        if (descriptorState.descriptorId) {
+            saveResponse(
+                ind.id,
+                descriptorState.descriptorId,
+                descriptorState.valueAssigned || 0,
+                debounceComment
+            );
+        }
+    }, [debounceComment, assignmentDispatch, ind.id]); // Removed descriptorState to avoid infinite loop
+
+    return (
         <article className="px-5 py-6">
             <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
                 <aside>
@@ -63,25 +65,25 @@ export default function Indicator ({ind}){
 
                         <button
                             type="button"
-                            onClick={()=>toggleAll()}
+                            onClick={() => toggleAll()}
                             className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-semibold text-zinc-700 transition hover:border-sky-700 hover:text-sky-800"
                         >
-                        {
-                            dropRubric 
-                            ? <FiChevronUp />
-                            : <FiChevronDown />
-                        }
+                            {
+                                dropRubric
+                                    ? <FiChevronUp />
+                                    : <FiChevronDown />
+                            }
                             Rúbrica
                         </button>
                     </div>
 
                     <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                        {   
-                            ind.descriptors?.length > 0 && 
-                            ind.descriptors.map(d=>
-                                <Descriptor key={d.id} descriptor={d}  dropRubric={dropRubric}
-                                    indicatorId={ind.id} selected={descriptorState?.descriptorId===d.id} dispatch={assignmentDispatch}
-                                /> 
+                        {
+                            ind.descriptors?.length > 0 &&
+                            ind.descriptors.map(d =>
+                                <Descriptor key={d.id} descriptor={d} dropRubric={dropRubric}
+                                    indicatorId={ind.id} selected={descriptorState?.descriptorId === d.id} dispatch={assignmentDispatch}
+                                />
                             )
                         }
                     </div>
@@ -100,6 +102,7 @@ export default function Indicator ({ind}){
                                 className="mt-3 w-full resize-y rounded-md border border-zinc-300 bg-white p-3 text-sm leading-6 text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-sky-700 focus:ring-2 focus:ring-sky-100"
                                 onChange={handleChange}
                                 placeholder="Escriba aquí su respuesta"
+                                value={comment}
                             />
                         </label>
 
@@ -123,7 +126,6 @@ export default function Indicator ({ind}){
                                 id={`file-upload-${ind.id}`}
                                 type="file"
                                 className="hidden"
-
                             />
                         </div>
                     </div>
