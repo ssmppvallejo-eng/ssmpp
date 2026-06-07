@@ -95,9 +95,9 @@ Campos importantes:
 - `addComment`
 - `addEvidence`
 - `complete`
-- `commment`
+- `comment`
 
-Observacion: el campo `commment` parece tener un typo. Probablemente deberia llamarse `comment`.
+Observacion: el campo `comment` parece tener un typo. Probablemente deberia llamarse `comment`.
 
 ## Usuarios
 
@@ -157,5 +157,5 @@ Une templates con indicadores.
 
 - Falta una restriccion unica clara para evitar respuestas duplicadas por `assignmentIndicatorId` y `descriptorId`, si esa es la regla de negocio.
 - El frontend actualmente usa el id de `Indicator` donde parece necesitarse el id de `AssignmentIndicator`.
-- El typo `commment` puede causar errores y confusion.
+- El typo `comment` puede causar errores y confusion.
 - Hay migraciones antiguas con nombres previos como `Assigment`, `Subsystem` y `Answer`, lo que explica parte de la mezcla de nombres en el codigo.

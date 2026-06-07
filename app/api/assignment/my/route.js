@@ -1,4 +1,4 @@
-import { prisma } from '../../../../lib/prima';
+import { prisma } from '../../../../lib/prisma';
 import { authOptions } from '../../../../lib/auth';
 import { getServerSession } from 'next-auth';
 
@@ -77,7 +77,7 @@ export async function GET (params) {
 
 
     }catch(error){
-        console.error("Error at fetching assigments:", error);
+        console.error("Error at fetching assignments:", error);
         return new Response(
         JSON.stringify({
             error: "Error interno del servidor",

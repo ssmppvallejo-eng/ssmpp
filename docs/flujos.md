@@ -27,7 +27,7 @@ La pantalla `/app` usa `ActivitiesProvider`.
 Flujo actual:
 
 1. `app/app/page.jsx` llama `fetchPreActivities`.
-2. `fetchPreActivities` consulta `/api/assigment/my`.
+2. `fetchPreActivities` consulta `/api/assignment/my`.
 3. El endpoint busca asignaciones relacionadas con `session.user.id`.
 4. Si el usuario tiene rol `ESTUDIANTE`, devuelve actividades asignadas.
 5. `PreActivities` renderiza la lista.
@@ -41,7 +41,7 @@ Flujo actual:
 
 1. La pantalla obtiene el `id` desde la URL.
 2. Llama `fetchActivity(id)`.
-3. El provider consulta `/api/assigment/:id`.
+3. El provider consulta `/api/assignment/:id`.
 4. El endpoint valida sesion.
 5. Revisa si la actividad pertenece al usuario mediante `UserAssignTo`.
 6. Consulta `Assignment` con su dimension e indicadores.

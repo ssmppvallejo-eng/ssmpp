@@ -1,4 +1,4 @@
-import { prisma } from "../../lib/prima";
+import { prisma } from "../../lib/prisma";
 
 export async function get_jwt_info(user) {
   try {

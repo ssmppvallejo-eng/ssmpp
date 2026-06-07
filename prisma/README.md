@@ -54,6 +54,6 @@ Esto importa porque un `Indicator` es parte de la rubrica general, pero `Assignm
 ## Pendientes del schema
 
 - Revisar si `AssignmentIndicatorDescriptor` necesita una llave unica compuesta por `assignmentIndicatorId` y `descriptorId`.
-- Corregir typo `commment`.
+- Corregir typo `comment`.
 - Confirmar si `valueAssigned` representa la respuesta del usuario o un valor copiado del descriptor.
 - Definir como se manejaran evidencias: nombre, URL, almacenamiento y permisos.

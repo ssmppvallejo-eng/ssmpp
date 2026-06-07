@@ -49,7 +49,7 @@ Estado compartido del frontend.
 
 Configuracion compartida.
 
-- `lib/prima.js`: instancia global de Prisma Client.
+- `lib/prisma.js`: instancia global de Prisma Client.
 - `lib/auth.js`: configuracion de NextAuth y callbacks.
 
 ### `domain/`

@@ -23,7 +23,7 @@ El frontend usa `indicatorId` como `assignmentIndicatorId`. Para guardar correct
 - `Indicator.id`: indicador base de la rubrica.
 - `AssignmentIndicator.id`: indicador dentro de una asignacion concreta.
 
-### Corregir endpoint `POST /api/assigment/[id]`
+### Corregir endpoint `POST /api/assignment/[id]`
 
 El endpoint no llama la funcion de guardado para estudiantes. Ademas, la funcion de guardado usa una llave compuesta que no existe actualmente en Prisma.
 
@@ -31,11 +31,11 @@ El endpoint no llama la funcion de guardado para estudiantes. Ademas, la funcion
 
 Hay typos que conviene corregir antes de crecer el sistema:
 
-- `assigment` -> `assignment`
+- `assignment` -> `assignment`
 - `prima` -> `prisma`
 - `hiddeNav` -> `hideNav`
 - `PreActiviities` -> `PreActivities`
-- `commment` -> `comment`
+- `comment` -> `comment`
 - `GOOGLE_CLIENT_SECRECT` -> `GOOGLE_CLIENT_SECRET`
 
 ## Prioridad media

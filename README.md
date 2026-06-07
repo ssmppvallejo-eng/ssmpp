@@ -71,7 +71,7 @@ La base de datos esta organizada alrededor de:
 
 ## Advertencias actuales
 
-- Algunas rutas usan `assigment` en lugar de `assignment`.
+- Algunas rutas usan `assignment` en lugar de `assignment`.
 - Hay inconsistencias entre `active` y `valid` en autenticacion.
 - El flujo de guardar respuestas no esta conectado de punta a punta.
 - Existen endpoints incompletos o con referencias a modelos antiguos.

@@ -1,4 +1,4 @@
-import { prisma } from '../../../../lib/prima';
+import { prisma } from '../../../../lib/prisma';
 import { authOptions } from '../../../../lib/auth';
 import { getServerSession } from 'next-auth';
 import { SYSTEM_ROLES } from '../../../../constants/assignmentStatus';
@@ -9,7 +9,7 @@ export async function GET (request, context) {
     const params = await context.params;
     const { id } = params;
 
-    const assigmentId = Number(id);
+    const assignmentId = Number(id);
 
 
     try{
@@ -30,7 +30,7 @@ export async function GET (request, context) {
                 where: {
                     assignmentId_userId:{
                         userId: session.user.id,
-                        assignmentId: assigmentId
+                        assignmentId: assignmentId
                     }
 
                 },
@@ -44,7 +44,7 @@ export async function GET (request, context) {
         const dbAssignment = await prisma.assignment.findUnique(
             {
                 where:{
-                    id: assigmentId,
+                    id: assignmentId,
                 },
                 include:{
                     dimension: {
@@ -159,7 +159,7 @@ export async function GET (request, context) {
             }
         );
     }catch(error){
-        console.error("Error at fetching assigments:", error);
+        console.error("Error at fetching assignments:", error);
         return new Response(
         JSON.stringify({
             error: "Error interno del servidor",
@@ -189,12 +189,19 @@ export async function POST (request){
 
         switch(session.user.role){
             case SYSTEM_ROLES.ESTUDIANTE:
-                
+                const result = await postStudentAssignment(body);
+                return new Response(
+                    JSON.stringify(result),
+                    {
+                        status:200,
+                        headers:{"Content-Type":"application/json"}
+                    }
+                );
             default:
             return new Response(
                 JSON.stringify({message: "Forbidden"}),{
                     status:403,
-                    headers:{"Content_type":"application/json"}
+                    headers:{"Content-Type":"application/json"}
                 } 
             );
         }
@@ -223,7 +230,7 @@ async function postStudentAssignment(body){
 
     const descriptor = await  prisma.assignmentIndicatorDescriptor.upsert({
         where: {
-            descriptor_answer_id:{
+            assignmentIndicatorId_descriptorId:{
                 assignmentIndicatorId: body.assignmentIndicatorId,
                 descriptorId: body.descriptorId,
             },
@@ -237,7 +244,6 @@ async function postStudentAssignment(body){
         },
         update:{
             ...optionalData,
-            descriptorId: body.descriptorId,
             valueAssigned: body.valueAssigned,
         }
     });

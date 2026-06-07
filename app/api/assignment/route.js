@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prima';
+import { prisma } from '../../../lib/prisma';
 import { authOptions } from '../../../lib/auth';
 import { getServerSession } from 'next-auth';
 
@@ -17,7 +17,7 @@ export async function GET(params) {
         }
 
         if(session.user.role==='ADMINISTRADOR'){
-            const assigment = await prisma.assigment.findMany();
+            const assignment = await prisma.assignment.findMany();
         }
 
 

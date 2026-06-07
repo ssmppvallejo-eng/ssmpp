@@ -51,9 +51,11 @@ model AssignmentIndicatorDescriptor {
   addEvidence           Boolean             @default(false)
   complete              Boolean             @default(false)
   id                    Int                 @id @default(autoincrement())
-  commment              String?
+  comment               String?
   assignmentIndicator   AssignmentIndicator @relation(fields: [assignmentIndicatorId], references: [id])
   descriptor            Descriptor          @relation(fields: [descriptorId], references: [id])
+
+  @@unique([assignmentIndicatorId, descriptorId])
 }
 
 model Component {

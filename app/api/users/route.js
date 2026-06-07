@@ -1,4 +1,4 @@
-import { prima } from '../../../lib/prima';
+import { prisma } from '../../../lib/prisma';
 import { authOptions } from '../../../lib/auth';
 import { getServerSession } from 'next-auth';
 
@@ -26,7 +26,7 @@ export async function GET (params) {
             );
         }
 
-        const users = await prima.user.findMany();
+        const users = await prisma.user.findMany();
 
         return new Response(
             JSON.stringify(users),{

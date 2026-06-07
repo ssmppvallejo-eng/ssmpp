@@ -22,7 +22,7 @@ export const  ActivityProvider = ({children}) =>{
         setLoadingPreActivities(true);
 
         try{
-            const request = '/api/assigment/my';
+            const request = '/api/assignment/my';
             const response = await fetch(request);
             const data  = await response.json();
 
@@ -90,7 +90,7 @@ export const  ActivityProvider = ({children}) =>{
         setLoadingActivity(true);
 
         try{    
-            const request = `/api/assigment/${actNumber}`;
+            const request = `/api/assignment/${actNumber}`;
             const response = await fetch(request);
             const data = await response.json();
 

@@ -25,18 +25,18 @@ Estado actual:
   - llama `getServerSession` sin `await`;
   - no valida roles de forma estricta.
 
-### `api/assigment`
+### `api/assignment`
 
 Endpoint general de asignaciones.
 
 Estado actual:
 
 - esta incompleto;
-- usa `assigment`, pero el modelo Prisma actual es `assignment`;
+- usa `assignment`, pero el modelo Prisma actual es `assignment`;
 - no devuelve respuesta en todos los caminos;
 - el `catch` esta vacio.
 
-### `api/assigment/my`
+### `api/assignment/my`
 
 Devuelve las actividades asignadas al usuario autenticado.
 
@@ -48,7 +48,7 @@ Flujo:
 4. Devuelve una lista simple para la pantalla `/app`.
 5. Otros roles reciben `403`.
 
-### `api/assigment/[id]`
+### `api/assignment/[id]`
 
 Obtiene detalle de una asignacion especifica y contiene un `POST` todavia incompleto.
 
@@ -67,4 +67,4 @@ POST actual:
 
 ## Nota de nombres
 
-La carpeta usa `assigment`, pero la palabra correcta es `assignment`. Ademas, Prisma ya usa el modelo `Assignment`, por lo que conviene normalizar esta ruta antes de crecer el API.
+La carpeta usa `assignment`, pero la palabra correcta es `assignment`. Ademas, Prisma ya usa el modelo `Assignment`, por lo que conviene normalizar esta ruta antes de crecer el API.
