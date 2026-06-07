@@ -72,7 +72,7 @@ export async function POST(
         if (error instanceof z.ZodError) {
             return NextResponse.json({
                 error: "Error de validación",
-                details: error.errors
+                details: (error as any).errors || error.issues
             }, { status: 400 });
         }
         if (error.message.includes('FORBIDDEN')) {

@@ -1,9 +1,10 @@
 "use client";
+import { ReactNode } from "react";
 import Navbar from "../../components/app/Navbar";
 import { ActivityProvider } from "../../providers/ActivitiesProvider";
-import {  useStyle } from "../../providers/StyleProvider";
+import { useStyle } from "../../providers/StyleProvider";
 
-export default function LayoutContent({ children }) {
+export default function LayoutContent({ children }: { children: ReactNode }) {
     const { visibleNav } = useStyle();
 
     return (

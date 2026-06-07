@@ -8,7 +8,8 @@ import { FiArrowLeft, FiClock, FiSave, FiSend } from "react-icons/fi";
 import Link from "next/link";
 
 export default  function AssignmentPage () {
-    const { id } = useParams(); 
+    const params = useParams();
+    const id = params?.id as string;
 
     const  {
         loadingActivity,
