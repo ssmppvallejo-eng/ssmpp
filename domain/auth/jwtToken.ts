@@ -1,6 +1,6 @@
 import { prisma } from "../../lib/prisma";
 
-export async function get_jwt_info(user) {
+export async function get_jwt_info(user: any) {
   try {
     const existingUser = await prisma.user.findUnique({
       where: { email: user.email }
@@ -17,7 +17,7 @@ export async function get_jwt_info(user) {
       userId: existingUser.id,
       role: existingUser.role,
       email: existingUser.email,
-      active: existingUser.active
+      valid: existingUser.active // Mapping 'active' to 'valid' for the JWT as seen in lib/auth.js
     };
 
   } catch (error) {
