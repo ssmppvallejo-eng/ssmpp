@@ -1,6 +1,6 @@
 import { authOptions } from '../../../../lib/auth';
 import { getServerSession } from 'next-auth';
-import { SYSTEM_ROLES } from '../../../../constants/assignmentStatus';
+import { Role } from '../../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { SaveAssignmentResponseSchema } from '../../../../src/core/application/dtos/AssignmentDTO';
 import { z } from 'zod';
@@ -58,7 +58,7 @@ export async function POST(
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        if (session.user.role !== SYSTEM_ROLES.ESTUDIANTE) {
+        if (session.user.role !== Role.ESTUDIANTE) {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 

@@ -1,6 +1,5 @@
 'use client';
 import React, { useContext, useReducer, createContext, useState, useCallback } from "react";
-import { ASSIGNMENT_STATUS } from '../constants/assignmentStatus';
 import { 
   ActivityContextType, 
   ActivityProviderProps, 
@@ -43,7 +42,7 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
 
     const initialStateAss: AssignmentState = {
         descriptors: {},
-        status: ASSIGNMENT_STATUS.PENDIENTE,
+        status: 'PENDIENTE',
     };
 
     const assignmentReducer = (state: AssignmentState, action: AssignmentAction): AssignmentState => {
@@ -99,7 +98,7 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
 
             const fillState: AssignmentState = {
                 descriptors: {},
-                status: data.status || ASSIGNMENT_STATUS.PENDIENTE,
+                status: data.status || 'PENDIENTE',
             };
 
             data.Judgement.forEach((j) => {
