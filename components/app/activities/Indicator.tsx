@@ -46,7 +46,7 @@ export default function Indicator({ ind }: IndicatorProps) {
                 debounceComment
             );
         }
-    }, [debounceComment, assignmentDispatch, ind.id]); // Removed descriptorState to avoid infinite loop
+    }, [debounceComment, assignmentDispatch, descriptorState, ind.id, saveResponse]);
 
     return (
         <article className="px-5 py-6">

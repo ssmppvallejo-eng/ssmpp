@@ -21,10 +21,12 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                 assignmentIndicatorId: data.assignmentIndicatorId,
                 descriptorId: data.descriptorId,
                 valueAssigned: data.valueAssigned,
+                complete: true,
             },
             update: {
                 ...optionalData,
                 valueAssigned: data.valueAssigned,
+                complete: true,
             }
         });
 
@@ -116,5 +118,31 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
             },
         });
         return !!isMyActivity;
+    }
+
+    async getAssignmentCompletion(assignmentId: number): Promise<{ totalIndicators: number; answeredIndicators: number }> {
+        const assignmentIndicators = await prisma.assignmentIndicator.findMany({
+            where: { assignmentId },
+            select: {
+                id: true,
+                descriptorAssignments: {
+                    where: { complete: true },
+                    select: { assignmentIndicatorId: true },
+                    take: 1,
+                },
+            },
+        });
+
+        return {
+            totalIndicators: assignmentIndicators.length,
+            answeredIndicators: assignmentIndicators.filter((indicator) => indicator.descriptorAssignments.length > 0).length,
+        };
+    }
+
+    async submitAssignment(assignmentId: number): Promise<any> {
+        return await prisma.assignment.update({
+            where: { id: assignmentId },
+            data: { status: "ENVIADO" },
+        });
     }
 }

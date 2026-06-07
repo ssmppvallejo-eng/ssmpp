@@ -78,6 +78,11 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
                         }
                     }
                 };
+            case "SET_STATUS":
+                return {
+                    ...state,
+                    status: action.payload.status,
+                };
             default:
                 return state;
         }
@@ -124,33 +129,105 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
         }
     }, []);
 
-    const saveResponse = async (
+    const persistResponse = useCallback(async (
+        assignmentIndicatorId: number,
+        descriptorId: number,
+        valueAssigned: number,
+        comment?: string
+    ) => {
+        if (!activity.id) {
+            throw new Error("No activity loaded to save response");
+        }
+
+        const response = await fetch(`/api/assignment/${activity.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                assignmentIndicatorId,
+                descriptorId,
+                valueAssigned,
+                comment
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to save response");
+        }
+    }, [activity.id]);
+
+    const saveResponse = useCallback(async (
         assignmentIndicatorId: number, 
         descriptorId: number, 
         valueAssigned: number, 
         comment?: string
     ) => {
         try {
-            const response = await fetch(`/api/assignment/${activity.id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    assignmentIndicatorId,
-                    descriptorId,
-                    valueAssigned,
-                    comment
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to save response");
-            }
-
+            await persistResponse(assignmentIndicatorId, descriptorId, valueAssigned, comment);
             console.log(`Response saved for indicator ${assignmentIndicatorId}`);
         } catch (error) {
             console.error("Error saving response:", error);
         }
-    };
+    }, [persistResponse]);
+
+    const submitAssignment = useCallback(async () => {
+        if (!activity.id) {
+            return { ok: false, message: "No hay una actividad cargada para enviar." };
+        }
+
+        try {
+            const selectedResponses = Object.values(assignmentState.descriptors).filter(
+                (descriptor) => descriptor.assignmentIndicatorId && descriptor.descriptorId && descriptor.valueAssigned
+            );
+
+            await Promise.all(
+                selectedResponses.map((descriptor) =>
+                    persistResponse(
+                        descriptor.assignmentIndicatorId as number,
+                        descriptor.descriptorId as number,
+                        descriptor.valueAssigned as number,
+                        descriptor.comment || undefined
+                    )
+                )
+            );
+
+            const response = await fetch(`/api/assignment/${activity.id}/submit`, {
+                method: "POST",
+            });
+
+            if (!response.ok) {
+                if (response.status === 409) {
+                    return { ok: false, message: "Responde todos los indicadores antes de enviar la actividad." };
+                }
+
+                throw new Error("Failed to submit assignment");
+            }
+
+            const updatedAssignment = await response.json();
+
+            assignmentDispatch({
+                type: "SET_STATUS",
+                payload: { status: updatedAssignment.status },
+            });
+
+            setActivity((currentActivity) => ({
+                ...currentActivity,
+                status: updatedAssignment.status,
+            }));
+
+            setPreActivities((currentActivities) =>
+                currentActivities.map((preActivity) =>
+                    preActivity.assignmentId === updatedAssignment.id
+                        ? { ...preActivity, status: updatedAssignment.status }
+                        : preActivity
+                    )
+            );
+            
+            return { ok: true };
+        } catch (error) {
+            console.error("Error submitting assignment:", error);
+            return { ok: false, message: "No se pudo enviar la actividad. Inténtalo de nuevo." };
+        }
+    }, [activity.id, assignmentState.descriptors, persistResponse]);
 
     const value: ActivityContextType = {
         preActivities,
@@ -161,7 +238,8 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
         fetchActivity,
         assignmentState,
         assignmentDispatch,
-        saveResponse
+        saveResponse,
+        submitAssignment
     };
 
     return (

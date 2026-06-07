@@ -51,7 +51,8 @@ export interface AssignmentState {
 export type AssignmentAction =
   | { type: 'INIT_ASSIGNMENT'; payload: AssignmentState }
   | { type: 'SET_DESCRIPTOR'; payload: { assignmentIndicatorId: number; descriptorId: number; valueAssigned: number } }
-  | { type: 'SET_COMMENT'; payload: { assignmentIndicatorId: number; comment: string } };
+  | { type: 'SET_COMMENT'; payload: { assignmentIndicatorId: number; comment: string } }
+  | { type: 'SET_STATUS'; payload: { status: string } };
 
 export interface ActivityContextType {
   preActivities: any[];
@@ -63,6 +64,7 @@ export interface ActivityContextType {
   assignmentState: AssignmentState;
   assignmentDispatch: React.Dispatch<AssignmentAction>;
   saveResponse: (assignmentIndicatorId: number, descriptorId: number, valueAssigned: number, comment?: string) => Promise<void>;
+  submitAssignment: () => Promise<{ ok: boolean; message?: string }>;
 }
 
 export interface ActivityProviderProps {

@@ -1,6 +1,6 @@
 "use client";
-import { useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useActivity } from '../../../../providers/ActivitiesProvider';
 import {  useStyle } from "../../../../providers/StyleProvider";
 import Judgement from '../../../../components/app/activities/Judgement';
@@ -10,11 +10,15 @@ import Link from "next/link";
 export default  function AssignmentPage () {
     const params = useParams();
     const id = params?.id as string;
+    const router = useRouter();
+    const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
 
     const  {
         loadingActivity,
         activity,
-        fetchActivity
+        fetchActivity,
+        submitAssignment
     } = useActivity();
 
     const {
@@ -27,6 +31,22 @@ export default  function AssignmentPage () {
         showNav();
         fetchActivity(id);
     }, [fetchActivity, id, showNav]);
+
+    const handleSubmit = async () => {
+        setSubmitting(true);
+        setSubmitMessage(null);
+
+        const result = await submitAssignment();
+
+        setSubmitting(false);
+
+        if (result.ok) {
+            router.push("/app");
+            return;
+        }
+
+        setSubmitMessage(result.message || "No se pudo enviar la actividad.");
+    };
 
     return(
         <div className="mx-auto w-full max-w-7xl px-5 py-6 sm:px-8 lg:px-10">
@@ -85,6 +105,11 @@ export default  function AssignmentPage () {
                     </div>
 
                     <footer className="flex flex-col gap-3 border-t border-zinc-200 bg-stone-50 px-5 py-5 sm:flex-row sm:justify-end sm:px-8">
+                        {submitMessage && (
+                            <p className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 sm:mr-auto">
+                                {submitMessage}
+                            </p>
+                        )}
                         <button
                             type="button"
                             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-700 transition hover:border-sky-700 hover:text-sky-800"
@@ -94,10 +119,12 @@ export default  function AssignmentPage () {
                         </button>
                         <button
                             type="button"
-                            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-zinc-950 px-5 text-sm font-semibold text-white transition hover:bg-sky-800"
+                            onClick={handleSubmit}
+                            disabled={submitting}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-zinc-950 px-5 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
                         >
                             <FiSend />
-                            Enviar actividad
+                            {submitting ? "Enviando..." : "Enviar actividad"}
                         </button>
                     </footer>
                 </section>
