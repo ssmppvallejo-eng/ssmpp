@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="Portafolio académico de José Víctor Manuel Vallejo Córdoba, Doctor en Administración."
+  >
+  <title>José Víctor Manuel Vallejo Córdoba | Portafolio académico</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-white font-sans text-gray-900 antialiased">
+  <header class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
+    <nav
+      class="mx-auto flex h-20 max-w-7xl items-center justify-between gap-8 px-5 sm:px-8"
+      aria-label="Navegación principal"
+    >
+      <a href="#inicio" class="shrink-0 text-xl font-extrabold text-gray-950">
+        <span class="text-blue-500">V</span>Vallejo
+      </a>
+
+      <div class="hidden items-center gap-7 text-sm font-medium text-gray-600 lg:flex">
+        <a href="#inicio" class="transition hover:text-gray-950">Inicio</a>
+        <a href="#acerca" class="transition hover:text-gray-950">Acerca de mí</a>
+
+        <div class="group relative">
+          <a href="#investigacion" class="inline-flex items-center gap-1 py-7 transition hover:text-gray-950">
+            Investigación
+            <svg class="size-4 transition group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="m6 9 6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <div
+            class="invisible absolute left-1/2 top-full w-56 -translate-x-1/2 border border-gray-200 bg-white p-2 opacity-0 transition group-hover:visible group-hover:opacity-100"
+          >
+            <a href="#articulos" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Artículos</a>
+            <a href="#capitulos" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Capítulos de libros</a>
+          </div>
+        </div>
+
+        <div class="group relative">
+          <a href="#sitios" class="inline-flex items-center gap-1 py-7 transition hover:text-gray-950">
+            Sitios de interés
+            <svg class="size-4 transition group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="m6 9 6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <div
+            class="invisible absolute left-1/2 top-full w-64 -translate-x-1/2 border border-gray-200 bg-white p-2 opacity-0 transition group-hover:visible group-hover:opacity-100"
+          >
+            <a href="#tesauros" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Tesauros</a>
+            <a href="#repositorios" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Repositorios de tesis</a>
+            <a href="#recursos" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Video tutoriales</a>
+            <a href="#recursos" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Herramientas de IA</a>
+            <a href="#indicadores" class="block rounded-md px-3 py-2.5 hover:bg-gray-50 hover:text-blue-600">Indicadores y estadísticas</a>
+          </div>
+        </div>
+
+        <a href="#contacto" class="transition hover:text-gray-950">Contacto</a>
+      </div>
+
+      <a
+        href="/landing/accounts"
+        class="inline-flex h-10 shrink-0 items-center justify-center rounded-md bg-black px-4 text-sm font-semibold text-white transition hover:bg-blue-600"
+      >
+        Iniciar sesión
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="border-b border-gray-200">
+      <div class="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:py-20">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase text-blue-500">Portafolio académico</p>
+          <h1 class="mt-5 text-5xl font-extrabold leading-[1.05] text-gray-950 sm:text-6xl lg:text-7xl">
+            José Víctor Manuel Vallejo Córdoba
+          </h1>
+          <p class="mt-7 text-xl leading-8 text-gray-600">Doctor en Administración</p>
+          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#acerca"
+              class="inline-flex h-12 items-center justify-center rounded-md bg-black px-6 text-sm font-semibold text-white transition hover:bg-blue-600"
+            >
+              Conocer trayectoria
+            </a>
+            <a
+              href="#investigacion"
+              class="inline-flex h-12 items-center justify-center rounded-md border border-gray-300 px-6 text-sm font-semibold transition hover:border-blue-500 hover:text-blue-600"
+            >
+              Ver investigación
+            </a>
+          </div>
+        </div>
+
+        <figure class="relative mx-auto w-full max-w-lg">
+          <div class="absolute -left-4 top-8 h-full w-full border border-gray-200 bg-gray-50"></div>
+          <img
+            src="https://placehold.co/800x1000/f4f4f5/18181b?text=Fotograf%C3%ADa+de+perfil"
+            alt="Espacio para fotografía de perfil de José Víctor Manuel Vallejo Córdoba"
+            class="relative aspect-[4/5] w-full object-cover"
+          >
+        </figure>
+      </div>
+    </section>
+
+    <section id="acerca" class="px-5 py-24 sm:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase text-blue-500">Acerca de mí</p>
+          <h2 class="mt-4 text-4xl font-bold text-gray-950 sm:text-5xl">Trayectoria académica y profesional</h2>
+          <p class="mt-5 text-base leading-7 text-gray-600">
+            Formación, experiencia y participación en redes académicas vinculadas con la administración,
+            la educación y la sistematización de información.
+          </p>
+        </div>
+
+        <div class="mt-14 grid gap-5 lg:grid-cols-3">
+          <article class="rounded-lg border border-gray-200 p-7">
+            <div class="mb-6 flex size-10 items-center justify-center rounded-md bg-blue-50 text-blue-500">
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="m3 10 9-5 9 5-9 5-9-5Z" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M7 12.5V17c3 2 7 2 10 0v-4.5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold">Grados académicos</h3>
+            <ul class="mt-6 divide-y divide-gray-100 text-sm leading-6 text-gray-600">
+              <li class="py-3">Doctorado en Administración</li>
+              <li class="py-3">Maestría en Administración</li>
+              <li class="py-3">Licenciatura</li>
+              <li class="py-3">Carrera Técnica</li>
+            </ul>
+          </article>
+
+          <article class="rounded-lg border border-gray-200 p-7">
+            <div class="mb-6 flex size-10 items-center justify-center rounded-md bg-blue-50 text-blue-500">
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M4 7h16v12H4zM9 7V5h6v2" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold">Experiencia profesional</h3>
+            <ul class="mt-6 divide-y divide-gray-100 text-sm leading-6 text-gray-600">
+              <li class="py-3">Profesor colaborador</li>
+              <li class="py-3">Coordinador del Centro de Sistematización</li>
+              <li class="py-3">Aerohive Certified</li>
+              <li class="py-3">Administrador de Laboratorios · 2002–2008</li>
+            </ul>
+          </article>
+
+          <article class="rounded-lg border border-gray-200 p-7">
+            <div class="mb-6 flex size-10 items-center justify-center rounded-md bg-blue-50 text-blue-500">
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="9" stroke-width="2"/>
+                <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold">Redes académicas</h3>
+            <ul class="mt-6 divide-y divide-gray-100 text-sm font-medium">
+              <li><a href="#" class="flex items-center justify-between py-3 hover:text-blue-600">Google Académico <span>↗</span></a></li>
+              <li><a href="#" class="flex items-center justify-between py-3 hover:text-blue-600">ResearchGate <span>↗</span></a></li>
+              <li><a href="#" class="flex items-center justify-between py-3 hover:text-blue-600">ORCID <span>↗</span></a></li>
+              <li><a href="#" class="flex items-center justify-between py-3 hover:text-blue-600">LinkedIn <span>↗</span></a></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="investigacion" class="bg-black px-5 py-24 text-white sm:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase text-blue-400">Investigación</p>
+          <h2 class="mt-4 text-4xl font-bold sm:text-5xl">Producción académica</h2>
+          <p class="mt-5 text-base leading-7 text-gray-300">
+            Espacio destinado a artículos, capítulos y referencias bibliográficas completas.
+          </p>
+        </div>
+
+        <div class="mt-14 grid gap-14 lg:grid-cols-2">
+          <div id="articulos">
+            <h3 class="text-2xl font-semibold">Artículos</h3>
+            <ol class="mt-6 divide-y divide-gray-800 border-t border-gray-800">
+              <li class="py-6">
+                <p class="text-xs font-semibold uppercase text-blue-400">Artículo 01</p>
+                <p class="mt-2 leading-7 text-gray-300">Referencia bibliográfica del artículo por integrar.</p>
+              </li>
+              <li class="py-6">
+                <p class="text-xs font-semibold uppercase text-blue-400">Artículo 02</p>
+                <p class="mt-2 leading-7 text-gray-300">Referencia bibliográfica del artículo por integrar.</p>
+              </li>
+              <li class="py-6">
+                <p class="text-xs font-semibold uppercase text-blue-400">Artículo 03</p>
+                <p class="mt-2 leading-7 text-gray-300">Referencia bibliográfica del artículo por integrar.</p>
+              </li>
+            </ol>
+          </div>
+
+          <div id="capitulos">
+            <h3 class="text-2xl font-semibold">Capítulos de libros</h3>
+            <ol class="mt-6 divide-y divide-gray-800 border-t border-gray-800">
+              <li class="py-6">
+                <p class="text-xs font-semibold uppercase text-blue-400">Capítulo 01</p>
+                <p class="mt-2 leading-7 text-gray-300">Referencia bibliográfica del capítulo por integrar.</p>
+              </li>
+              <li class="py-6">
+                <p class="text-xs font-semibold uppercase text-blue-400">Capítulo 02</p>
+                <p class="mt-2 leading-7 text-gray-300">Referencia bibliográfica del capítulo por integrar.</p>
+              </li>
+              <li class="py-6">
+                <p class="text-xs font-semibold uppercase text-blue-400">Capítulo 03</p>
+                <p class="mt-2 leading-7 text-gray-300">Referencia bibliográfica del capítulo por integrar.</p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sitios" class="px-5 py-24 sm:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase text-blue-500">Sitios de interés</p>
+          <h2 class="mt-4 text-4xl font-bold text-gray-950 sm:text-5xl">Fuentes y repositorios</h2>
+          <p class="mt-5 text-base leading-7 text-gray-600">
+            Accesos organizados a vocabularios especializados, repositorios académicos y herramientas de consulta.
+          </p>
+        </div>
+
+        <div id="tesauros" class="mt-14">
+          <h3 class="text-xl font-semibold">Tesauros y catálogos</h3>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <a href="#" class="group rounded-lg border border-gray-200 p-6 transition hover:border-blue-400">
+              <span class="text-xs font-semibold uppercase text-blue-500">Tesauro</span>
+              <h4 class="mt-5 text-lg font-semibold group-hover:text-blue-600">UNESCO</h4>
+              <p class="mt-2 text-sm text-gray-500">Vocabulario controlado internacional.</p>
+            </a>
+            <a href="#" class="group rounded-lg border border-gray-200 p-6 transition hover:border-blue-400">
+              <span class="text-xs font-semibold uppercase text-blue-500">Tesauro</span>
+              <h4 class="mt-5 text-lg font-semibold group-hover:text-blue-600">UNBIS</h4>
+              <p class="mt-2 text-sm text-gray-500">Sistema bibliográfico de Naciones Unidas.</p>
+            </a>
+            <a href="#" class="group rounded-lg border border-gray-200 p-6 transition hover:border-blue-400">
+              <span class="text-xs font-semibold uppercase text-blue-500">Catálogo</span>
+              <h4 class="mt-5 text-lg font-semibold group-hover:text-blue-600">Library of Congress</h4>
+              <p class="mt-2 text-sm text-gray-500">Autoridades y recursos bibliográficos.</p>
+            </a>
+            <a href="#" class="group rounded-lg border border-gray-200 p-6 transition hover:border-blue-400">
+              <span class="text-xs font-semibold uppercase text-blue-500">Repositorio</span>
+              <h4 class="mt-5 text-lg font-semibold group-hover:text-blue-600">CORA</h4>
+              <p class="mt-2 text-sm text-gray-500">Recursos de acceso abierto.</p>
+            </a>
+          </div>
+        </div>
+
+        <div id="repositorios" class="mt-12">
+          <h3 class="text-xl font-semibold">Repositorios de tesis</h3>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <a href="#" class="rounded-lg border border-gray-200 p-6 font-semibold transition hover:border-blue-400 hover:text-blue-600">ProQuest</a>
+            <a href="#" class="rounded-lg border border-gray-200 p-6 font-semibold transition hover:border-blue-400 hover:text-blue-600">TESIUNAM</a>
+            <a href="#" class="rounded-lg border border-gray-200 p-6 font-semibold transition hover:border-blue-400 hover:text-blue-600">Repositorio BUAP</a>
+            <a href="#" class="rounded-lg border border-gray-200 p-6 font-semibold transition hover:border-blue-400 hover:text-blue-600">OATD</a>
+          </div>
+        </div>
+
+        <div id="recursos" class="mt-12 grid gap-4 md:grid-cols-2">
+          <article class="rounded-lg border border-gray-200 p-7">
+            <p class="text-xs font-semibold uppercase text-blue-500">Aprendizaje</p>
+            <h3 class="mt-3 text-xl font-semibold">Video tutoriales</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Colección de recursos audiovisuales para búsqueda, análisis y gestión de información.</p>
+          </article>
+          <article class="rounded-lg border border-gray-200 p-7">
+            <p class="text-xs font-semibold uppercase text-blue-500">Tecnología</p>
+            <h3 class="mt-3 text-xl font-semibold">Herramientas de IA</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Directorio de herramientas para investigación, síntesis y organización académica.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="indicadores" class="border-y border-gray-200 bg-gray-50 px-5 py-24 sm:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase text-blue-500">Datos</p>
+          <h2 class="mt-4 text-4xl font-bold text-gray-950 sm:text-5xl">Indicadores y estadísticas</h2>
+        </div>
+
+        <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            DataMéxico <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            ExportaMx <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            DENUE <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            SIAVI <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            SIAP <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            BANXICO <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            OMC <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+          <a href="#" class="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 font-semibold transition hover:border-blue-400 hover:text-blue-600">
+            INEGI <span class="text-blue-500 transition group-hover:translate-x-1">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contacto" class="bg-black px-5 py-12 text-white sm:px-8">
+    <div class="mx-auto flex max-w-7xl flex-col gap-10 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-xl font-bold"><span class="text-blue-400">V</span>Vallejo</p>
+        <p class="mt-3 max-w-md text-sm leading-6 text-gray-400">
+          Portafolio académico y directorio de recursos para investigación.
+        </p>
+      </div>
+
+      <address class="grid gap-3 text-sm not-italic text-gray-300 sm:grid-cols-3 sm:gap-8">
+        <a href="tel:2224657379" class="transition hover:text-blue-400">
+          <span class="block text-xs uppercase text-gray-500">Teléfono</span>
+          2224657379
+        </a>
+        <a href="mailto:victor.vallejo@correo.buap.mx" class="transition hover:text-blue-400">
+          <span class="block text-xs uppercase text-gray-500">Correo</span>
+          victor.vallejo@correo.buap.mx
+        </a>
+        <p>
+          <span class="block text-xs uppercase text-gray-500">Ubicación</span>
+          Río Verde, San Manuel, Puebla
+        </p>
+      </address>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-7xl border-t border-gray-800 pt-6 text-xs text-gray-500">
+      © 2026 José Víctor Manuel Vallejo Córdoba.
+    </div>
+  </footer>
+</body>
+</html>
