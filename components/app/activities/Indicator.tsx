@@ -50,12 +50,12 @@ export default function Indicator({ ind }: IndicatorProps) {
 
     return (
         <article className="px-5 py-6">
-            <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
-                <aside>
+            <div className="flex flex-col gap-4">
+                <div>
                     <span className="inline-flex rounded-md bg-sky-50 px-3 py-1.5 text-sm font-semibold text-sky-800">
                         Indicador {ind.code}
                     </span>
-                </aside>
+                </div>
 
                 <section>
                     <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
