@@ -70,6 +70,9 @@ export async function POST(
         if (error.message.includes('FORBIDDEN')) {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
+        if (error.message.includes('VALIDATION')) {
+            return NextResponse.json({ message: error.message }, { status: 409 });
+        }
 
         console.error("Error at posting assignments:", error);
         return NextResponse.json({

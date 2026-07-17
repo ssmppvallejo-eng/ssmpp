@@ -15,11 +15,20 @@ export async function GET(
     const assignmentId = Number(id);
 
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR, Role.COORDINADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR, Role.COORDINADOR, Role.EVALUADOR]);
         if (error) return error;
 
         if (!Number.isInteger(assignmentId)) {
             return NextResponse.json({ message: "Invalid assignment id" }, { status: 400 });
+        }
+
+        // Admin y coordinador supervisan cualquier asignacion; el evaluador
+        // solo las que tiene asignadas.
+        if (session.user.role === Role.EVALUADOR) {
+            const isMember = await repository.verifyOwnership(assignmentId, session.user.id);
+            if (!isMember) {
+                return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+            }
         }
 
         const assignment = await reviewUseCase.execute(assignmentId);

@@ -104,8 +104,18 @@ Pendiente:
 
 - adjuntar evidencia documental (no hay mecanismo de subida de archivos).
 
-## 9. Revision
+## 9. Revision (evaluador)
 
-El modelo tiene roles como `COORDINADOR`, `PROFESOR` y `EVALUADOR`, ademas de estados como `EN_REVISION` y `COMPLETADO`.
+Cierra el ciclo de vida de la evaluacion: `ENVIADO -> EN_REVISION -> COMPLETADO`.
 
-El flujo de revision (juicios de valor del evaluador, asignacion de evaluadores) todavia no esta implementado en pantallas ni endpoints.
+1. Con la evaluacion en `ENVIADO`, el administrador asigna un evaluador desde la vista de revision (`POST /api/assignment/:id/evaluators`; requiere usuario aprobado con rol `EVALUADOR`). Al asignar el primero, el estado pasa a `EN_REVISION`.
+2. El evaluador ve la evaluacion en su lista de actividades; al abrirla se muestra el panel de evaluacion (`EvaluatorPanel`) en lugar de la rubrica de respuesta.
+3. Por indicador, el evaluador ve la respuesta del evaluado (descriptor, comentario, evidencia) y la justificacion normativa, y emite su juicio de valor numerico (escala 1-3) y textual (`POST /api/assignment/:id/judgement`).
+4. Cuando todos los indicadores tienen juicio, el evaluador completa la revision (`POST /api/assignment/:id/complete`) y el estado pasa a `COMPLETADO`; si falta alguno responde `409`.
+
+Reglas relacionadas del ciclo de estados (RF-SIS-007):
+
+- La primera respuesta guardada mueve la asignacion de `PENDIENTE` a `EN_PROCESO`.
+- Despues del envio, el evaluado ya no puede modificar respuestas (`409`).
+
+Pendiente: estado `NO_COMPLETADO` por expiracion de la fecha limite.

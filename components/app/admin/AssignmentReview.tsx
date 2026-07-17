@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FiArrowLeft, FiBookOpen, FiCheckCircle, FiFileText, FiMessageSquare, FiUser } from "react-icons/fi";
+import { useSession } from "next-auth/react";
+import { FiArrowLeft, FiBookOpen, FiCheckCircle, FiFileText, FiMessageSquare, FiUser, FiUserPlus } from "react-icons/fi";
 
 interface ReviewDescriptor {
     id: number;
@@ -65,10 +66,26 @@ function formatDate(value?: string | null) {
     return new Date(value).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+interface EvaluatorOption {
+    id: number;
+    email: string;
+    name?: string | null;
+    role: string;
+    accessStatus: string;
+}
+
 export default function AssignmentReview({ assignmentId }: { assignmentId: string }) {
+    const { data: session } = useSession();
+    const isAdmin = session?.user.role === "ADMINISTRADOR";
+
     const [assignment, setAssignment] = useState<ReviewAssignment | null>(null);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const [evaluators, setEvaluators] = useState<EvaluatorOption[]>([]);
+    const [selectedEvaluator, setSelectedEvaluator] = useState<number | "">("");
+    const [assigning, setAssigning] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -91,7 +108,55 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
         return () => {
             cancelled = true;
         };
-    }, [assignmentId]);
+    }, [assignmentId, refreshKey]);
+
+    useEffect(() => {
+        if (!isAdmin) return;
+        let cancelled = false;
+
+        fetch("/api/users")
+            .then((response) => {
+                if (!response.ok) throw new Error("No se pudieron obtener los evaluadores");
+                return response.json();
+            })
+            .then((data: EvaluatorOption[]) => {
+                if (cancelled) return;
+                setEvaluators(data.filter((user) => user.role === "EVALUADOR" && user.accessStatus === "APROBADO"));
+            })
+            .catch(() => {
+                // La seccion de asignar evaluador simplemente no se muestra si falla.
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isAdmin]);
+
+    const assignEvaluator = async () => {
+        if (selectedEvaluator === "" || assigning) return;
+        setAssigning(true);
+        setErrorMessage(null);
+
+        try {
+            const response = await fetch(`/api/assignment/${assignmentId}/evaluators`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: selectedEvaluator }),
+            });
+
+            if (!response.ok) {
+                const body = await response.json().catch(() => null);
+                throw new Error(body?.message ?? "No se pudo asignar el evaluador");
+            }
+
+            setSelectedEvaluator("");
+            setRefreshKey((key) => key + 1);
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : "Error inesperado");
+        } finally {
+            setAssigning(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -173,6 +238,49 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
                         </div>
                     </div>
                 </div>
+
+                {isAdmin && (assignment.status === "ENVIADO" || assignment.status === "EN_REVISION") && (
+                    <div className="mt-6 rounded-md border border-violet-200 bg-violet-50/50 p-4">
+                        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase text-violet-700">
+                            <FiUserPlus className="size-4" />
+                            Asignar evaluador
+                        </p>
+                        <p className="mt-1 text-sm text-zinc-600">
+                            Al asignar un evaluador, la evaluación pasa a revisión y el evaluador podrá emitir juicios de valor por indicador.
+                        </p>
+                        {evaluators.length === 0 ? (
+                            <p className="mt-3 text-sm text-zinc-500">
+                                No hay usuarios aprobados con rol EVALUADOR. Asigna el rol desde el panel de usuarios.
+                            </p>
+                        ) : (
+                            <div className="mt-3 flex flex-wrap items-center gap-3">
+                                <select
+                                    value={selectedEvaluator}
+                                    onChange={(event) => setSelectedEvaluator(event.target.value === "" ? "" : Number(event.target.value))}
+                                    className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900"
+                                >
+                                    <option value="">Selecciona un evaluador...</option>
+                                    {evaluators
+                                        .filter((evaluator) => !assignment.assignedUsers.some((user) => user.id === evaluator.id))
+                                        .map((evaluator) => (
+                                            <option key={evaluator.id} value={evaluator.id}>
+                                                {evaluator.name ?? evaluator.email}
+                                            </option>
+                                        ))}
+                                </select>
+                                <button
+                                    type="button"
+                                    disabled={selectedEvaluator === "" || assigning}
+                                    onClick={assignEvaluator}
+                                    className="inline-flex h-10 items-center gap-2 rounded-md bg-violet-700 px-4 text-sm font-semibold text-white transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <FiUserPlus className="size-4" />
+                                    {assigning ? "Asignando..." : "Asignar"}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </header>
 
             <div className="flex flex-col gap-6">

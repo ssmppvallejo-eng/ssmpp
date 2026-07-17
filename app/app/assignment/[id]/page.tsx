@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useActivity } from '../../../../providers/ActivitiesProvider';
 import {  useStyle } from "../../../../providers/StyleProvider";
 import Judgement from '../../../../components/app/activities/Judgement';
+import EvaluatorPanel from '../../../../components/app/evaluation/EvaluatorPanel';
 import { FiArrowLeft, FiClock, FiSave, FiSend } from "react-icons/fi";
 import Link from "next/link";
 
@@ -11,8 +13,12 @@ export default  function AssignmentPage () {
     const params = useParams();
     const id = params?.id as string;
     const router = useRouter();
+    const { data: session } = useSession();
     const [submitMessage, setSubmitMessage] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+
+    // Un evaluador asignado no responde la rubrica: ve el panel de juicio de valor.
+    const isEvaluator = session?.user.role === "EVALUADOR";
 
     const  {
         loadingActivity,
@@ -29,8 +35,10 @@ export default  function AssignmentPage () {
 
     useEffect(()=>{
         showNav();
-        fetchActivity(id);
-    }, [fetchActivity, id, showNav]);
+        if (!isEvaluator) {
+            fetchActivity(id);
+        }
+    }, [fetchActivity, id, showNav, isEvaluator]);
 
     const handleSubmit = async () => {
         setSubmitting(true);
@@ -47,6 +55,10 @@ export default  function AssignmentPage () {
 
         setSubmitMessage(result.message || "No se pudo enviar la actividad.");
     };
+
+    if (isEvaluator) {
+        return <EvaluatorPanel assignmentId={id} />;
+    }
 
     return(
         <div className="mx-auto w-full max-w-7xl px-5 py-6 sm:px-8 lg:px-10">

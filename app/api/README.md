@@ -77,8 +77,20 @@ Flujo:
 
 ### `api/assignment/[id]/submit`
 
-`POST` (solo `ESTUDIANTE`): envia la actividad.
+`POST`: envia la actividad (cualquier usuario asignado via `UserAssignTo`).
 
 - valida ownership (`403`);
 - valida que todos los indicadores tengan respuesta (`409` si estan incompletos);
 - marca la asignacion como `ENVIADO`.
+
+### `api/assignment/[id]/evaluators`
+
+`POST` (solo `ADMINISTRADOR`): asigna un evaluador a una evaluacion `ENVIADO` o `EN_REVISION`. El usuario debe estar aprobado y tener rol `EVALUADOR`. Al asignar el primero, el estado pasa a `EN_REVISION`.
+
+### `api/assignment/[id]/judgement`
+
+`POST` (`EVALUADOR` y `COORDINADOR`, siendo miembros de la asignacion): guarda el juicio de valor de un indicador (`evaluationValue` 1-3 y `note` textual). Requiere que la asignacion este `EN_REVISION` y que el indicador tenga respuesta del evaluado.
+
+### `api/assignment/[id]/complete`
+
+`POST` (`EVALUADOR` y `COORDINADOR`, siendo miembros): completa la revision. Si algun indicador no tiene juicio de valor responde `409`; si todos lo tienen, el estado pasa a `COMPLETADO`.
