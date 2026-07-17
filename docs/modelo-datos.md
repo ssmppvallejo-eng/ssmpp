@@ -97,7 +97,7 @@ Campos importantes:
 - `complete`
 - `comment`
 
-Observacion: el campo `comment` parece tener un typo. Probablemente deberia llamarse `comment`.
+Existe una restriccion unica sobre `(assignmentIndicatorId, descriptorId)` que evita respuestas duplicadas por descriptor dentro de un indicador asignado.
 
 ## Usuarios
 
@@ -109,9 +109,11 @@ Campos importantes:
 
 - `email`
 - `role`
-- `active`
+- `accessStatus` (control de acceso: `PENDIENTE`, `APROBADO`, `RECHAZADO`)
 - `image`
 - `name`
+
+Toda cuenta nueva entra como `PENDIENTE` y solo puede usar el sistema cuando un administrador la aprueba.
 
 ### `UserAssignTo`
 
@@ -145,6 +147,12 @@ Une templates con indicadores.
 - `EN_REVISION`
 - `COMPLETADO`
 
+### Estados de acceso (`AccessStatus`)
+
+- `PENDIENTE`: cuenta registrada, en espera de aprobacion.
+- `APROBADO`: cuenta con acceso al sistema.
+- `RECHAZADO`: cuenta denegada.
+
 ### Roles
 
 - `ADMINISTRADOR`
@@ -155,7 +163,7 @@ Une templates con indicadores.
 
 ## Riesgos del modelo actual
 
-- Falta una restriccion unica clara para evitar respuestas duplicadas por `assignmentIndicatorId` y `descriptorId`, si esa es la regla de negocio.
-- El frontend actualmente usa el id de `Indicator` donde parece necesitarse el id de `AssignmentIndicator`.
-- El typo `comment` puede causar errores y confusion.
+- `submissionDate` es la fecha limite/cierre de la asignacion (se fija al crearla), no la fecha en que el estudiante envio. No existe todavia un campo que registre el momento del envio.
+- El enum de estados aun no incluye `NO_COMPLETADO` (expiracion por fecha limite), previsto en el SRS.
+- La tabla `Judgement` almacena criterios de la rubrica; no confundir con el "juicio de valor" del evaluador, que vive en `evaluationValue` y `note` de `AssignmentIndicatorDescriptor`.
 - Hay migraciones antiguas con nombres previos como `Assigment`, `Subsystem` y `Answer`, lo que explica parte de la mezcla de nombres en el codigo.

@@ -7,33 +7,54 @@ Cuando el usuario entra a `/`, `proxy.js` revisa si existe un token de NextAuth.
 - Si hay token, redirige a `/app`.
 - Si no hay token, redirige a `/landing`.
 
-## 2. Login
+## 2. Login y control de acceso
 
-El login vive en `app/landing/accounts/page.jsx`.
+El login vive en `app/landing/accounts/page.tsx`. Cualquier cuenta de Google puede iniciar sesion, pero solo las cuentas aprobadas pueden usar el sistema (RF-SIS-001).
 
-Flujo esperado:
+Flujo:
 
-1. Usuario presiona `Sign In`.
+1. Usuario presiona `Continuar con Google`.
 2. NextAuth inicia login con Google.
 3. `signIn` callback revisa el perfil.
-4. Si el usuario no existe, `login_with_google` lo crea en base de datos.
-5. `jwt` callback carga datos del usuario desde la base.
+4. Si el usuario no existe, `login_with_google` lo crea en base de datos con `accessStatus: PENDIENTE`.
+5. `jwt` callback carga `userId`, `role` y `accessStatus` desde la base. Esta consulta se repite en cada refresco del token, por lo que una aprobacion o cambio de rol surte efecto sin necesidad de re-login.
 6. `session` callback expone esos datos en `session.user`.
 
-## 3. Listado de actividades
+Despues del login, el acceso se decide por `accessStatus`:
+
+- `APROBADO`: entra al area privada `/app`.
+- `PENDIENTE` o `RECHAZADO`: el layout de `/app` (server-side) lo redirige a `/landing/accounts/status`, que muestra el estado de su cuenta y un boton de cerrar sesion.
+
+En el backend, todos los endpoints usan `requireApprovedSession()` (`lib/apiAuth.ts`), que responde `401` sin sesion y `403` si la cuenta no esta aprobada o el rol no esta permitido.
+
+## 3. Aprobacion de cuentas (administrador)
+
+La pantalla `/app/admin/users` es visible solo para el rol `ADMINISTRADOR` (RF-USR-002/003/004).
+
+Flujo:
+
+1. `UsersManager` consulta `GET /api/users` (solo administradores).
+2. Se listan todos los usuarios con foto, nombre, email, estado de acceso y rol.
+3. El administrador puede aprobar o rechazar cuentas y, para cuentas aprobadas, asignar rol.
+4. Cada accion llama `PATCH /api/users/:id`, validado con Zod y ejecutado por `UpdateUserAccessUseCase`.
+5. Un administrador no puede modificar su propia cuenta; esto evita que el sistema quede sin administradores.
+
+El primer administrador se siembra manualmente en la base de datos (columna `role` de la tabla `User`).
+
+## 4. Listado de actividades
 
 La pantalla `/app` usa `ActivitiesProvider`.
 
 Flujo actual:
 
-1. `app/app/page.jsx` llama `fetchPreActivities`.
+1. `app/app/page.tsx` llama `fetchPreActivities`.
 2. `fetchPreActivities` consulta `/api/assignment/my`.
 3. El endpoint busca asignaciones relacionadas con `session.user.id`.
 4. Si el usuario tiene rol `ESTUDIANTE`, devuelve actividades asignadas.
 5. `PreActivities` renderiza la lista.
 6. Cada item navega hacia `app/assignment/:id`.
 
-## 4. Detalle de actividad
+## 5. Detalle de actividad
 
 La pantalla `/app/assignment/[id]` carga una actividad especifica.
 
@@ -42,33 +63,28 @@ Flujo actual:
 1. La pantalla obtiene el `id` desde la URL.
 2. Llama `fetchActivity(id)`.
 3. El provider consulta `/api/assignment/:id`.
-4. El endpoint valida sesion.
+4. El endpoint valida sesion y cuenta aprobada.
 5. Revisa si la actividad pertenece al usuario mediante `UserAssignTo`.
 6. Consulta `Assignment` con su dimension e indicadores.
 7. Reorganiza indicadores por criterio (`Judgement`).
 8. Devuelve una estructura preparada para el frontend.
 
-## 5. Responder rubrica
+## 6. Responder y enviar la rubrica
 
-Flujo parcialmente implementado:
+Flujo actual:
 
-1. El usuario selecciona un descriptor.
-2. `Descriptor.jsx` actualiza estado local mediante el reducer.
-3. El usuario escribe comentario.
-4. `Indicator.jsx` actualiza estado local despues de un debounce.
-5. Actualmente los datos se imprimen en consola.
+1. El usuario selecciona un descriptor y, si aplica, escribe un comentario.
+2. Los cambios se guardan con autoguardado mediante `POST /api/assignment/:id`, que ejecuta `SaveStudentResponseUseCase` y hace upsert en `AssignmentIndicatorDescriptor`.
+3. Al terminar, el usuario envia la actividad con `POST /api/assignment/:id/submit`.
+4. `SubmitStudentAssignmentUseCase` valida ownership y completitud: si hay indicadores sin responder, responde `409`.
+5. Si todo esta completo, la asignacion pasa a estado `ENVIADO`.
 
 Pendiente:
 
-- enviar los datos al backend,
-- validar permisos,
-- guardar en `AssignmentIndicatorDescriptor`,
-- manejar evidencia,
-- marcar indicadores o asignaciones como completas,
-- permitir envio formal de la actividad.
+- adjuntar evidencia documental (no hay mecanismo de subida de archivos).
 
-## 6. Revision
+## 7. Revision
 
 El modelo tiene roles como `COORDINADOR`, `PROFESOR` y `EVALUADOR`, ademas de estados como `EN_REVISION` y `COMPLETADO`.
 
-El flujo de revision todavia no esta implementado en pantallas ni endpoints.
+El flujo de revision (juicios de valor del evaluador, asignacion de evaluadores) todavia no esta implementado en pantallas ni endpoints.
