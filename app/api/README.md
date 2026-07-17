@@ -43,7 +43,18 @@ Responsabilidades:
 
 ### `api/dimensions`
 
-`GET` (solo `ADMINISTRADOR`): catalogo jerarquico dimension -> componentes -> criterios -> indicadores, usado por el formulario de creacion de asignaciones.
+`GET` (solo `ADMINISTRADOR`): catalogo jerarquico completo (dimension -> componentes -> criterios -> indicadores -> descriptores, con justificacion normativa), usado por el creador de asignaciones y el gestor del instrumento.
+
+`POST` (solo `ADMINISTRADOR`): crea una dimension (codigo unico, titulo, descripcion opcional).
+
+### CRUD del instrumento
+
+Rutas `POST /api/{components|judgements|indicators}` y `PATCH`/`DELETE /api/{dimensions|components|judgements|indicators}/[id]`, mas `PATCH /api/descriptors/[id]` (solo `ADMINISTRADOR`). Implementan RF-DIM-011 a RF-COM-017:
+
+- codigos unicos por nivel (`409` si se repite);
+- el padre debe existir (`404` si no);
+- crear un indicador exige exactamente 3 descriptores; sus ponderaciones se fijan en 1, 2 y 3 (RF-DES-015) y de los descriptores solo se editan titulo y descripcion;
+- eliminar exige ir de abajo hacia arriba: un registro con hijos o usado en asignaciones responde `409`.
 
 ### `api/templates`
 
