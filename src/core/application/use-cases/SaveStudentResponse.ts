@@ -19,8 +19,20 @@ export class SaveStudentResponseUseCase {
             throw new Error("FORBIDDEN: Indicator does not belong to this assignment");
         }
 
-        // 3. Save the response
+        // 3. Reject edits once the assignment was submitted
+        const assignment = await this.assignmentRepository.getAssignmentStatus(assignmentId);
+        if (!assignment || (assignment.status !== "PENDIENTE" && assignment.status !== "EN_PROCESO")) {
+            throw new Error("VALIDATION: assignment was already submitted");
+        }
+
+        // 4. Save the response
         const result = await this.assignmentRepository.saveDescriptorResponse(data);
+
+        // 5. First response moves the assignment to EN_PROCESO (RF-SIS-007)
+        if (assignment.status === "PENDIENTE") {
+            await this.assignmentRepository.updateStatus(assignmentId, "EN_PROCESO");
+        }
+
         return result;
     }
 }

@@ -43,7 +43,18 @@ Responsabilidades:
 
 ### `api/dimensions`
 
-`GET` (solo `ADMINISTRADOR`): catalogo jerarquico dimension -> componentes -> criterios -> indicadores, usado por el formulario de creacion de asignaciones.
+`GET` (solo `ADMINISTRADOR`): catalogo jerarquico completo (dimension -> componentes -> criterios -> indicadores -> descriptores, con justificacion normativa), usado por el creador de asignaciones y el gestor del instrumento.
+
+`POST` (solo `ADMINISTRADOR`): crea una dimension (codigo unico, titulo, descripcion opcional).
+
+### CRUD del instrumento
+
+Rutas `POST /api/{components|judgements|indicators}` y `PATCH`/`DELETE /api/{dimensions|components|judgements|indicators}/[id]`, mas `PATCH /api/descriptors/[id]` (solo `ADMINISTRADOR`). Implementan RF-DIM-011 a RF-COM-017:
+
+- codigos unicos por nivel (`409` si se repite);
+- el padre debe existir (`404` si no);
+- crear un indicador exige exactamente 3 descriptores; sus ponderaciones se fijan en 1, 2 y 3 (RF-DES-015) y de los descriptores solo se editan titulo y descripcion;
+- eliminar exige ir de abajo hacia arriba: un registro con hijos o usado en asignaciones responde `409`.
 
 ### `api/templates`
 
@@ -71,10 +82,26 @@ Flujo:
 
 `POST` (solo `ESTUDIANTE`): guarda la respuesta de un indicador (descriptor seleccionado y comentario). Body validado con Zod (`SaveAssignmentResponseSchema`). Hace upsert en `AssignmentIndicatorDescriptor` mediante `SaveStudentResponseUseCase`.
 
+### `api/assignment/[id]/review`
+
+`GET` (solo `ADMINISTRADOR` y `COORDINADOR`): vista de supervision (RF-ASIG-010). Devuelve la jerarquia completa de la asignacion con, por indicador: justificacion normativa, los 3 descriptores, la respuesta capturada (descriptor, comentario, evidencia) y el juicio de valor del evaluador cuando exista, ademas de progreso, responsables y fechas. No exige pertenencia.
+
 ### `api/assignment/[id]/submit`
 
-`POST` (solo `ESTUDIANTE`): envia la actividad.
+`POST`: envia la actividad (cualquier usuario asignado via `UserAssignTo`).
 
 - valida ownership (`403`);
 - valida que todos los indicadores tengan respuesta (`409` si estan incompletos);
 - marca la asignacion como `ENVIADO`.
+
+### `api/assignment/[id]/evaluators`
+
+`POST` (solo `ADMINISTRADOR`): asigna un evaluador a una evaluacion `ENVIADO` o `EN_REVISION`. El usuario debe estar aprobado y tener rol `EVALUADOR`. Al asignar el primero, el estado pasa a `EN_REVISION`.
+
+### `api/assignment/[id]/judgement`
+
+`POST` (`EVALUADOR` y `COORDINADOR`, siendo miembros de la asignacion): guarda el juicio de valor de un indicador (`evaluationValue` 1-3 y `note` textual). Requiere que la asignacion este `EN_REVISION` y que el indicador tenga respuesta del evaluado.
+
+### `api/assignment/[id]/complete`
+
+`POST` (`EVALUADOR` y `COORDINADOR`, siendo miembros): completa la revision. Si algun indicador no tiene juicio de valor responde `409`; si todos lo tienen, el estado pasa a `COMPLETADO`.

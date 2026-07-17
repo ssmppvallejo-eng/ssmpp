@@ -156,10 +156,56 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
     }
 
     async submitAssignment(assignmentId: number): Promise<any> {
+        return await this.updateStatus(assignmentId, "ENVIADO");
+    }
+
+    async getAssignmentStatus(assignmentId: number): Promise<{ id: number; status: string } | null> {
+        return await prisma.assignment.findUnique({
+            where: { id: assignmentId },
+            select: { id: true, status: true },
+        });
+    }
+
+    async updateStatus(assignmentId: number, status: string): Promise<any> {
         return await prisma.assignment.update({
             where: { id: assignmentId },
-            data: { status: "ENVIADO" },
+            data: { status: status as any },
         });
+    }
+
+    async addUserToAssignment(assignmentId: number, userId: number): Promise<any> {
+        return await prisma.userAssignTo.create({
+            data: { assignmentId, userId },
+        });
+    }
+
+    async saveJudgement(assignmentIndicatorId: number, evaluationValue: number, note?: string | null): Promise<number> {
+        const result = await prisma.assignmentIndicatorDescriptor.updateMany({
+            where: { assignmentIndicatorId },
+            data: {
+                evaluationValue,
+                ...(note !== undefined && { note }),
+            },
+        });
+        return result.count;
+    }
+
+    async getJudgementCompletion(assignmentId: number): Promise<{ total: number; judged: number }> {
+        const assignmentIndicators = await prisma.assignmentIndicator.findMany({
+            where: { assignmentId },
+            select: {
+                descriptorAssignments: {
+                    where: { evaluationValue: { not: null } },
+                    select: { id: true },
+                    take: 1,
+                },
+            },
+        });
+
+        return {
+            total: assignmentIndicators.length,
+            judged: assignmentIndicators.filter((indicator) => indicator.descriptorAssignments.length > 0).length,
+        };
     }
 
     async findAllWithDetails(): Promise<any[]> {
@@ -179,8 +225,80 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                         },
                     },
                 },
+                indicators: {
+                    select: {
+                        descriptorAssignments: {
+                            where: { complete: true },
+                            select: { id: true },
+                            take: 1,
+                        },
+                    },
+                },
                 _count: {
                     select: { indicators: true },
+                },
+            },
+        });
+    }
+
+    async findAssignmentForReview(id: number): Promise<any | null> {
+        return await prisma.assignment.findUnique({
+            where: { id },
+            include: {
+                dimension: {
+                    select: { code: true, title: true, description: true },
+                },
+                owner: {
+                    select: { name: true, email: true },
+                },
+                assignedUsers: {
+                    select: {
+                        user: {
+                            select: { id: true, name: true, email: true, image: true },
+                        },
+                    },
+                },
+                indicators: {
+                    select: {
+                        id: true,
+                        indicator: {
+                            select: {
+                                id: true,
+                                code: true,
+                                description: true,
+                                justification: true,
+                                descriptors: {
+                                    orderBy: { value: "asc" },
+                                    select: {
+                                        id: true,
+                                        title: true,
+                                        description: true,
+                                        value: true,
+                                    },
+                                },
+                                judgement: {
+                                    select: {
+                                        id: true,
+                                        code: true,
+                                        title: true,
+                                        description: true,
+                                    },
+                                },
+                            },
+                        },
+                        descriptorAssignments: {
+                            select: {
+                                descriptorId: true,
+                                valueAssigned: true,
+                                comment: true,
+                                evaluationValue: true,
+                                note: true,
+                                evidenceName: true,
+                                evidenceUrl: true,
+                                complete: true,
+                            },
+                        },
+                    },
                 },
             },
         });

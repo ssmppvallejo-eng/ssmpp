@@ -22,3 +22,19 @@ export const CreateAssignmentSchema = z.object({
 );
 
 export type CreateAssignmentDTO = z.infer<typeof CreateAssignmentSchema>;
+
+export const AssignEvaluatorSchema = z.object({
+  userId: z.number().int(),
+});
+
+export type AssignEvaluatorDTO = z.infer<typeof AssignEvaluatorSchema>;
+
+// Juicio de valor por indicador (RF-ASIG-009): numerico en la escala 1-3 del
+// instrumento y textual opcional.
+export const SaveJudgementSchema = z.object({
+  assignmentIndicatorId: z.number().int(),
+  evaluationValue: z.number().int().min(1).max(3),
+  note: z.string().optional().nullable(),
+});
+
+export type SaveJudgementDTO = z.infer<typeof SaveJudgementSchema>;

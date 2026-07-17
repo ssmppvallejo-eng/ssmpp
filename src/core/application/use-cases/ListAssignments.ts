@@ -4,6 +4,14 @@ export class ListAssignmentsUseCase {
     constructor(private readonly assignmentRepository: IAssignmentRepository) {}
 
     async execute() {
-        return await this.assignmentRepository.findAllWithDetails();
+        const assignments = await this.assignmentRepository.findAllWithDetails();
+
+        return assignments.map(({ indicators, ...assignment }) => ({
+            ...assignment,
+            progress: {
+                total: indicators.length,
+                answered: indicators.filter((indicator: any) => indicator.descriptorAssignments.length > 0).length,
+            },
+        }));
     }
 }
