@@ -1,6 +1,5 @@
 import { requireApprovedSession } from "../../../../../lib/apiAuth";
 import { NextRequest, NextResponse } from "next/server";
-import { Role } from "../../../../../src/core/domain/entities/User";
 import { SubmitStudentAssignmentUseCase } from "../../../../../src/core/application/use-cases/SubmitStudentAssignment";
 import { PrismaAssignmentRepository } from "../../../../../src/infrastructure/persistence/PrismaAssignmentRepository";
 
@@ -15,7 +14,9 @@ export async function POST(
     const assignmentId = Number(id);
 
     try {
-        const { session, error } = await requireApprovedSession([Role.ESTUDIANTE]);
+        // La pertenencia (UserAssignTo) se valida en el caso de uso; cualquier
+        // usuario asignado a la actividad puede enviarla.
+        const { session, error } = await requireApprovedSession();
         if (error) return error;
 
         const result = await submitAssignmentUseCase.execute(session.user.id, assignmentId);

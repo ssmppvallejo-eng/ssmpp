@@ -1,5 +1,4 @@
 import { requireApprovedSession } from '../../../../lib/apiAuth';
-import { Role } from '../../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { SaveAssignmentResponseSchema } from '../../../../src/core/application/dtos/AssignmentDTO';
 import { z } from 'zod';
@@ -50,7 +49,9 @@ export async function POST(
     const assignmentId = Number(id);
 
     try {
-        const { session, error } = await requireApprovedSession([Role.ESTUDIANTE]);
+        // La pertenencia (UserAssignTo) se valida en el caso de uso; cualquier
+        // usuario asignado a la actividad puede responderla.
+        const { session, error } = await requireApprovedSession();
         if (error) return error;
 
         const json = await request.json();
