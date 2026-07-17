@@ -58,7 +58,24 @@ Rutas `POST /api/{components|judgements|indicators}` y `PATCH`/`DELETE /api/{dim
 
 ### `api/templates`
 
-`GET` (solo `ADMINISTRADOR`): lista plantillas con su posgrado y conteo de indicadores.
+Solo `ADMINISTRADOR`:
+
+- `GET`: lista plantillas con posgrado, ids de indicadores y conteo.
+- `POST`: crea una plantilla (nombre, descripcion opcional, posgrado existente y al menos un indicador).
+- `PATCH /api/templates/[id]`: edita datos y/o reemplaza el conjunto de indicadores.
+- `DELETE /api/templates/[id]`: elimina la plantilla y sus vinculos con indicadores.
+
+### `api/postgraduates`
+
+Solo `ADMINISTRADOR`:
+
+- `GET`: lista posgrados con conteo de plantillas y usuarios.
+- `POST` / `PATCH /[id]`: crea/edita (titulo, nivel, area de conocimiento).
+- `DELETE /[id]`: elimina el posgrado y sus vinculos con usuarios; si tiene plantillas responde `409`.
+
+### `api/users/[id]/postgraduates`
+
+`PUT` (solo `ADMINISTRADOR`): reemplaza el conjunto de posgrados a los que pertenece un usuario (`UserPostgraduate`).
 
 ### `api/assignment/my`
 

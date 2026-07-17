@@ -1,12 +1,8 @@
 # Mejoras pendientes
 
-Lista alineada con el SRS (Especificacion de Requerimientos v1.0). Lo ya completado: migracion a TypeScript, flujo completo del evaluado (responder/enviar), login y control de acceso, creacion de asignaciones (por indicador o plantilla), vista de supervision admin/coordinador (RF-ASIG-010), flujo del evaluador con juicios de valor (RF-ASIG-009, estados hasta COMPLETADO) y CRUD del instrumento (RF-DIM-011 a RF-COM-017 y RF-DES-015).
+Lista alineada con el SRS (Especificacion de Requerimientos v1.0). Lo ya completado: migracion a TypeScript, flujo completo del evaluado (responder/enviar), login y control de acceso, creacion de asignaciones (por indicador o plantilla), vista de supervision admin/coordinador (RF-ASIG-010), flujo del evaluador con juicios de valor (RF-ASIG-009, estados hasta COMPLETADO), CRUD del instrumento (RF-DIM-011 a RF-COM-017 y RF-DES-015), y gestion de posgrados, plantillas y vinculacion usuario-posgrado.
 
 ## Prioridad alta (Must del SRS)
-
-### Gestion de plantillas y posgrados
-
-El modo "por plantilla" del creador de asignaciones existe, pero no hay UI para crear plantillas ni posgrados (de los que dependen), ni para vincular usuarios a posgrados (`UserPostgraduate`). Tambien es prerequisito del filtro por posgrado.
 
 ### Ciclo de vida completo de estados
 

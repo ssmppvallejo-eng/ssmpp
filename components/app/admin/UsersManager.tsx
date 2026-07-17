@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { FiCheck, FiUser, FiX } from "react-icons/fi";
+import { FiBookOpen, FiCheck, FiUser, FiX } from "react-icons/fi";
 
 type AccessStatus = "PENDIENTE" | "APROBADO" | "RECHAZADO";
 
@@ -14,6 +14,12 @@ interface ManagedUser {
     image?: string | null;
     role: string;
     accessStatus: AccessStatus;
+    postgraduates?: { postgraduate: { id: number; title: string } }[];
+}
+
+interface PostgraduateOption {
+    id: number;
+    title: string;
 }
 
 const ROLES = ["ADMINISTRADOR", "ESTUDIANTE", "COORDINADOR", "PROFESOR", "EVALUADOR"];
@@ -33,20 +39,32 @@ const STATUS_LABELS: Record<AccessStatus, string> = {
 export default function UsersManager() {
     const { data: session } = useSession();
     const [users, setUsers] = useState<ManagedUser[]>([]);
+    const [postgraduates, setPostgraduates] = useState<PostgraduateOption[]>([]);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [savingUserId, setSavingUserId] = useState<number | null>(null);
 
+    const [linkingUser, setLinkingUser] = useState<ManagedUser | null>(null);
+    const [linkedIds, setLinkedIds] = useState<Set<number>>(new Set());
+    const [savingLinks, setSavingLinks] = useState(false);
+
     useEffect(() => {
         let cancelled = false;
 
-        fetch("/api/users")
-            .then((response) => {
+        Promise.all([
+            fetch("/api/users").then((response) => {
                 if (!response.ok) throw new Error("No se pudieron obtener los usuarios");
                 return response.json();
-            })
-            .then((data: ManagedUser[]) => {
-                if (!cancelled) setUsers(data);
+            }),
+            fetch("/api/postgraduates").then((response) => {
+                if (!response.ok) throw new Error("No se pudieron obtener los posgrados");
+                return response.json();
+            }),
+        ])
+            .then(([userData, postgraduateData]) => {
+                if (cancelled) return;
+                setUsers(userData);
+                setPostgraduates(postgraduateData);
             })
             .catch((error) => {
                 if (!cancelled) setErrorMessage(error instanceof Error ? error.message : "Error inesperado");
@@ -59,6 +77,43 @@ export default function UsersManager() {
             cancelled = true;
         };
     }, []);
+
+    const openLinking = (user: ManagedUser) => {
+        setLinkingUser(user);
+        setLinkedIds(new Set((user.postgraduates ?? []).map((entry) => entry.postgraduate.id)));
+    };
+
+    const toggleLinked = (id: number) => {
+        setLinkedIds((current) => {
+            const next = new Set(current);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const saveLinks = async () => {
+        if (!linkingUser || savingLinks) return;
+        setSavingLinks(true);
+        setErrorMessage(null);
+
+        try {
+            const response = await fetch(`/api/users/${linkingUser.id}/postgraduates`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ postgraduateIds: [...linkedIds] }),
+            });
+            if (!response.ok) throw new Error("No se pudieron guardar los posgrados del usuario");
+
+            const updated: ManagedUser = await response.json();
+            setUsers((current) => current.map((user) => (user.id === updated.id ? updated : user)));
+            setLinkingUser(null);
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : "Error inesperado");
+        } finally {
+            setSavingLinks(false);
+        }
+    };
 
     const updateUser = async (userId: number, changes: { accessStatus?: AccessStatus; role?: string }) => {
         setSavingUserId(userId);
@@ -116,6 +171,7 @@ export default function UsersManager() {
                                 <th className="px-4 py-3">Usuario</th>
                                 <th className="px-4 py-3">Acceso</th>
                                 <th className="px-4 py-3">Rol</th>
+                                <th className="px-4 py-3">Posgrados</th>
                                 <th className="px-4 py-3 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -172,6 +228,25 @@ export default function UsersManager() {
                                             )}
                                         </td>
                                         <td className="px-4 py-3">
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                {(user.postgraduates ?? []).map((entry) => (
+                                                    <span key={entry.postgraduate.id} className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-800">
+                                                        {entry.postgraduate.title}
+                                                    </span>
+                                                ))}
+                                                <button
+                                                    type="button"
+                                                    disabled={postgraduates.length === 0}
+                                                    onClick={() => openLinking(user)}
+                                                    title="Vincular posgrados"
+                                                    className="inline-flex h-7 items-center gap-1 rounded-md border border-zinc-300 bg-white px-2 text-xs font-semibold text-zinc-600 transition hover:border-sky-700 hover:text-sky-800 disabled:cursor-not-allowed disabled:opacity-40"
+                                                >
+                                                    <FiBookOpen className="size-3.5" />
+                                                    {(user.postgraduates ?? []).length === 0 ? "Vincular" : "Editar"}
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
                                             <div className="flex justify-end gap-2">
                                                 {user.accessStatus !== "APROBADO" && (
                                                     <button
@@ -202,6 +277,56 @@ export default function UsersManager() {
                             })}
                         </tbody>
                     </table>
+                </div>
+            )}
+
+            {linkingUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 p-4">
+                    <div className="w-full max-w-lg rounded-md border border-zinc-200 bg-white p-6 shadow-xl">
+                        <div className="flex items-center justify-between gap-4">
+                            <h2 className="text-lg font-semibold text-zinc-950">
+                                Posgrados de {linkingUser.name ?? linkingUser.email}
+                            </h2>
+                            <button type="button" onClick={() => setLinkingUser(null)} className="text-zinc-400 transition hover:text-zinc-950">
+                                <FiX className="size-5" />
+                            </button>
+                        </div>
+
+                        <div className="mt-5 flex max-h-72 flex-col gap-2 overflow-y-auto">
+                            {postgraduates.map((postgraduate) => (
+                                <label
+                                    key={postgraduate.id}
+                                    className="flex cursor-pointer items-center gap-3 rounded-md border border-zinc-200 px-3 py-2.5 transition hover:border-sky-300"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={linkedIds.has(postgraduate.id)}
+                                        onChange={() => toggleLinked(postgraduate.id)}
+                                        className="size-4 accent-sky-700"
+                                    />
+                                    <span className="text-sm font-medium text-zinc-800">{postgraduate.title}</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setLinkingUser(null)}
+                                className="inline-flex h-11 items-center rounded-md border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:border-zinc-400"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                disabled={savingLinks}
+                                onClick={saveLinks}
+                                className="inline-flex h-11 items-center rounded-md bg-sky-700 px-5 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {savingLinks ? "Guardando..." : "Guardar"}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { BsListTask } from "react-icons/bs";
-import { FiClipboard, FiHome, FiLayers, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
+import { FiAward, FiClipboard, FiCopy, FiHome, FiLayers, FiLogOut, FiSettings, FiShield, FiUser, FiUsers } from "react-icons/fi";
 
 const menuSections = [
     { title: "Actividades", href: "/app", icon: BsListTask },
@@ -15,12 +15,23 @@ const adminSections = [
     { title: "Usuarios", href: "/app/admin/users", icon: FiUsers },
     { title: "Asignaciones", href: "/app/admin/assignments", icon: FiClipboard },
     { title: "Instrumento", href: "/app/admin/instrument", icon: FiLayers },
+    { title: "Posgrados", href: "/app/admin/postgraduates", icon: FiAward },
+    { title: "Plantillas", href: "/app/admin/templates", icon: FiCopy },
 ];
+
+const ROLE_BADGES: Record<string, { label: string; gradient: string }> = {
+    ADMINISTRADOR: { label: "Administrador", gradient: "from-violet-600 to-fuchsia-500" },
+    COORDINADOR: { label: "Coordinador", gradient: "from-sky-600 to-cyan-500" },
+    PROFESOR: { label: "Profesor", gradient: "from-amber-500 to-orange-500" },
+    EVALUADOR: { label: "Evaluador", gradient: "from-emerald-600 to-teal-500" },
+    ESTUDIANTE: { label: "Estudiante", gradient: "from-sky-700 to-indigo-600" },
+};
 
 export default function Navbar() {
     const pathname = usePathname();
     const { data: session } = useSession();
     const isAdmin = session?.user.role === "ADMINISTRADOR";
+    const roleBadge = session?.user.role ? ROLE_BADGES[session.user.role] : null;
 
     return (
         <aside className="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-zinc-200 bg-white px-4 py-5 lg:flex lg:flex-col">
@@ -31,6 +42,35 @@ export default function Navbar() {
                     <p className="text-xs text-zinc-500">Seguimiento académico</p>
                 </div>
             </Link>
+
+            {session?.user && roleBadge && (
+                <div className={`mt-5 rounded-lg bg-gradient-to-r ${roleBadge.gradient} p-[1.5px] shadow-sm`}>
+                    <div className="flex items-center gap-3 rounded-[7px] bg-white px-3 py-3">
+                        {session.user.image ? (
+                            <Image
+                                src={session.user.image}
+                                alt=""
+                                width={40}
+                                height={40}
+                                className="size-10 rounded-full"
+                            />
+                        ) : (
+                            <span className="grid size-10 place-items-center rounded-full bg-zinc-100 text-zinc-400">
+                                <FiUser className="size-5" />
+                            </span>
+                        )}
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-zinc-950">
+                                {session.user.name ?? session.user.email}
+                            </p>
+                            <span className={`mt-1 inline-flex items-center gap-1 rounded-full bg-gradient-to-r ${roleBadge.gradient} px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm`}>
+                                <FiShield className="size-3" />
+                                {roleBadge.label}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <nav className="mt-8 flex flex-1 flex-col gap-1">
                 <p className="px-3 text-xs font-semibold uppercase text-zinc-400">Panel</p>
