@@ -1,60 +1,49 @@
 import { prisma } from '../../../../lib/prisma';
-import { authOptions } from '../../../../lib/auth';
-import { getServerSession } from 'next-auth';
+import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
+        const { session, error } = await requireApprovedSession();
+        if (error) return error;
 
-        switch (session.user.role) {
-            case 'ESTUDIANTE':
-                const dbAssignment = await prisma.userAssignTo.findMany({
-                    where: {
-                        userId: session.user.id,
-                    },
-                    include: {
-                        assignment: {
+        // La pertenencia se define por UserAssignTo, sin importar el rol:
+        // quien fue asignado a una actividad puede verla.
+        const dbAssignment = await prisma.userAssignTo.findMany({
+            where: {
+                userId: session.user.id,
+            },
+            include: {
+                assignment: {
+                    select: {
+                        assignmentDate: true,
+                        submissionDate: true,
+                        status: true,
+                        dimension: {
                             select: {
-                                assignmentDate: true,
-                                submissionDate: true,
-                                status: true,
-                                dimension: {
-                                    select: {
-                                        code: true,
-                                        title: true,
-                                        description: true,
-                                    },
-                                },
+                                code: true,
+                                title: true,
+                                description: true,
                             },
                         },
                     },
-                });
+                },
+            },
+        });
 
-                let assignments = [];
+        const assignments = dbAssignment.map((ass) => {
+            return {
+                assignmentId: ass.assignmentId,
+                title: ass.assignment.dimension.title,
+                index: ass.assignment.dimension.code,
+                description: ass.assignment?.dimension?.description ?? "",
+                status: ass.assignment.status,
+                assignmentDate: ass.assignment.assignmentDate,
+                submissionDate: ass.assignment.submissionDate
+            };
+        });
 
-                if (dbAssignment.length) {
-                    assignments = dbAssignment.map((ass) => {
-                        return {
-                            assignmentId: ass.assignmentId,
-                            title: ass.assignment.dimension.title,
-                            index: ass.assignment.dimension.code,
-                            description: ass.assignment?.dimension?.description ?? "",
-                            status: ass.assignment.status,
-                            assignmentDate: ass.assignment.assignmentDate,
-                            submissionDate: ass.assignment.submissionDate
-                        };
-                    });
-                }
-
-                return NextResponse.json(assignments);
-
-            default:
-                return new Response("Forbidden", { status: 403 });
-        }
+        return NextResponse.json(assignments);
 
     } catch (error: any) {
         console.error("Error at fetching assignments:", error);

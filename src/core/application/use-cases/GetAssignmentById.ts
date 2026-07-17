@@ -52,11 +52,17 @@ export class GetAssignmentByIdUseCase {
                 acc.push(judgement);
             }
 
+            const savedResponse = item.descriptorAssignments?.[0] ?? null;
+
             judgement.Indicators.push({
                 id: indicator.id,
+                // Id del indicador dentro de esta asignacion: es el que se usa
+                // para guardar respuestas (AssignmentIndicator.id).
+                assignmentIndicatorId: item.id,
                 code: indicator.code,
                 description: indicator.description,
-                descriptors: indicator.descriptors
+                descriptors: indicator.descriptors,
+                savedResponse,
             });
 
             return acc;

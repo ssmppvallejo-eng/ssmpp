@@ -2,6 +2,12 @@
 
 Esta carpeta contiene los endpoints del backend usando Route Handlers de Next.js.
 
+Todos los endpoints (excepto `api/auth`) validan la sesion con `requireApprovedSession()` de `lib/apiAuth.ts`:
+
+- sin sesion responde `401`;
+- cuenta con `accessStatus` distinto de `APROBADO` responde `403`;
+- si el endpoint restringe roles y el usuario no tiene uno permitido, responde `403`.
+
 ## Rutas actuales
 
 ### `api/auth/[...nextauth]`
@@ -12,59 +18,63 @@ Responsabilidades:
 
 - manejar login con Google,
 - crear sesion,
-- ejecutar callbacks definidos en `lib/auth.js`.
+- ejecutar callbacks definidos en `lib/auth.ts`.
 
 ### `api/users`
 
-Busca usuarios en base de datos.
+`GET` (solo `ADMINISTRADOR`): lista todos los usuarios con id, email, nombre, imagen, rol y estado de acceso. Usa `ListUsersUseCase`.
 
-Estado actual:
+### `api/users/[id]`
 
-- tiene errores de implementacion:
-  - importa `prima`, pero el cliente exportado se llama `prisma`;
-  - llama `getServerSession` sin `await`;
-  - no valida roles de forma estricta.
+`PATCH` (solo `ADMINISTRADOR`): actualiza `accessStatus` y/o `role` de un usuario. Body validado con Zod. Usa `UpdateUserAccessUseCase`, que rechaza con `403` si el administrador intenta modificar su propia cuenta y `404` si el usuario no existe.
 
 ### `api/assignment`
 
-Endpoint general de asignaciones.
+`GET` (solo `ADMINISTRADOR`): lista todas las asignaciones con dimension, creador, usuarios asignados y conteo de indicadores.
 
-Estado actual:
+`POST` (solo `ADMINISTRADOR`): crea una asignacion. Body validado con Zod (`CreateAssignmentSchema`):
 
-- esta incompleto;
-- usa `assignment`, pero el modelo Prisma actual es `assignment`;
-- no devuelve respuesta en todos los caminos;
-- el `catch` esta vacio.
+- `dimensionId`: dimension a evaluar;
+- `dueDate`: fecha de vencimiento (`submissionDate`);
+- `userIds`: usuarios responsables (deben existir y estar aprobados);
+- `indicatorIds` **o** `templateId` (exclusivos entre si): indicadores elegidos manualmente o tomados de una plantilla.
+
+`CreateAssignmentUseCase` valida que la dimension exista, que los indicadores existan y pertenezcan a la dimension, y crea `Assignment`, `AssignmentIndicator` y `UserAssignTo` en una sola transaccion.
+
+### `api/dimensions`
+
+`GET` (solo `ADMINISTRADOR`): catalogo jerarquico dimension -> componentes -> criterios -> indicadores, usado por el formulario de creacion de asignaciones.
+
+### `api/templates`
+
+`GET` (solo `ADMINISTRADOR`): lista plantillas con su posgrado y conteo de indicadores.
 
 ### `api/assignment/my`
 
-Devuelve las actividades asignadas al usuario autenticado.
+`GET`: devuelve las actividades asignadas al usuario autenticado.
 
 Flujo:
 
-1. Obtiene sesion.
-2. Si no hay sesion, responde `401`.
-3. Si el rol es `ESTUDIANTE`, busca registros en `UserAssignTo`.
-4. Devuelve una lista simple para la pantalla `/app`.
-5. Otros roles reciben `403`.
+1. Valida sesion y cuenta aprobada.
+2. Si el rol es `ESTUDIANTE`, busca registros en `UserAssignTo`.
+3. Devuelve una lista simple para la pantalla `/app`.
+4. Otros roles reciben `403`.
 
 ### `api/assignment/[id]`
 
-Obtiene detalle de una asignacion especifica y contiene un `POST` todavia incompleto.
+`GET`: detalle de una asignacion.
 
-GET actual:
-
-- valida sesion;
-- revisa que la asignacion pertenezca al usuario;
+- valida sesion y cuenta aprobada;
+- revisa que la asignacion pertenezca al usuario (`403` si no);
 - consulta `Assignment`, `Dimension`, `Indicator`, `Descriptor` y `Judgement`;
 - transforma los datos para que el frontend los renderice agrupados por criterio.
 
-POST actual:
+`POST` (solo `ESTUDIANTE`): guarda la respuesta de un indicador (descriptor seleccionado y comentario). Body validado con Zod (`SaveAssignmentResponseSchema`). Hace upsert en `AssignmentIndicatorDescriptor` mediante `SaveStudentResponseUseCase`.
 
-- parsea body;
-- valida sesion;
-- pero no ejecuta correctamente la persistencia para estudiantes.
+### `api/assignment/[id]/submit`
 
-## Nota de nombres
+`POST` (solo `ESTUDIANTE`): envia la actividad.
 
-La carpeta usa `assignment`, pero la palabra correcta es `assignment`. Ademas, Prisma ya usa el modelo `Assignment`, por lo que conviene normalizar esta ruta antes de crecer el API.
+- valida ownership (`403`);
+- valida que todos los indicadores tengan respuesta (`409` si estan incompletos);
+- marca la asignacion como `ENVIADO`.

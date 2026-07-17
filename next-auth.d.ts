@@ -1,13 +1,15 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
+type AccessStatus = "PENDIENTE" | "APROBADO" | "RECHAZADO";
+
 declare module "next-auth" {
   interface Session {
     user: {
       id: number;
       role: string;
       email: string;
-      valid: boolean;
+      accessStatus: AccessStatus;
     } & DefaultSession["user"];
   }
 
@@ -15,7 +17,7 @@ declare module "next-auth" {
     id: number;
     role: string;
     email: string;
-    valid: boolean;
+    accessStatus: AccessStatus;
   }
 }
 
@@ -24,7 +26,7 @@ declare module "next-auth/jwt" {
     userId: number;
     role: string;
     email: string;
-    valid: boolean;
+    accessStatus: AccessStatus;
     accessToken?: string;
   }
 }

@@ -12,7 +12,14 @@ export class SaveStudentResponseUseCase {
             throw new Error("FORBIDDEN: User does not own this assignment");
         }
 
-        // 2. Save the response
+        // 2. Verify the indicator belongs to this assignment (prevents writing
+        // responses into another assignment's indicators)
+        const belongs = await this.assignmentRepository.verifyIndicatorInAssignment(data.assignmentIndicatorId, assignmentId);
+        if (!belongs) {
+            throw new Error("FORBIDDEN: Indicator does not belong to this assignment");
+        }
+
+        // 3. Save the response
         const result = await this.assignmentRepository.saveDescriptorResponse(data);
         return result;
     }

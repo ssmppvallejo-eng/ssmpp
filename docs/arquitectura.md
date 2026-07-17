@@ -21,12 +21,14 @@ Usuario
 
 Contiene rutas visuales y rutas API.
 
-- `app/layout.jsx`: layout raiz, carga fuentes globales y `AuthProvider`.
-- `app/landing/page.jsx`: landing publica.
-- `app/landing/accounts/page.jsx`: boton de inicio de sesion con Google.
-- `app/app/layout.jsx`: layout del area privada.
-- `app/app/page.jsx`: listado de actividades asignadas.
-- `app/app/assignment/[id]/page.jsx`: detalle de una actividad.
+- `app/layout.tsx`: layout raiz, carga fuentes globales y `AuthProvider`.
+- `app/landing/page.tsx`: landing publica.
+- `app/landing/accounts/page.tsx`: boton de inicio de sesion con Google.
+- `app/landing/accounts/status/page.tsx`: estado de cuenta para usuarios pendientes o rechazados.
+- `app/app/layout.tsx`: layout del area privada; valida server-side que exista sesion y que la cuenta este aprobada.
+- `app/app/page.tsx`: listado de actividades asignadas.
+- `app/app/assignment/[id]/page.tsx`: detalle de una actividad.
+- `app/app/admin/users/page.tsx`: panel de gestion de usuarios, solo para `ADMINISTRADOR`.
 - `app/api/`: backend de Next.js.
 
 ### `components/`
@@ -49,15 +51,24 @@ Estado compartido del frontend.
 
 Configuracion compartida.
 
-- `lib/prisma.js`: instancia global de Prisma Client.
-- `lib/auth.js`: configuracion de NextAuth y callbacks.
+- `lib/prisma.ts`: instancia global de Prisma Client.
+- `lib/auth.ts`: configuracion de NextAuth y callbacks. El callback `jwt` consulta la base en cada refresco del token, por lo que cambios de rol o de estado de acceso aplican sin re-login.
+- `lib/apiAuth.ts`: helper `requireApprovedSession()` usado por todos los endpoints para validar sesion, cuenta aprobada y roles permitidos.
 
 ### `domain/`
 
 Funciones de dominio. Actualmente solo contiene logica de autenticacion:
 
-- crear usuario si entra con Google por primera vez.
-- obtener informacion del usuario para el JWT.
+- crear usuario si entra con Google por primera vez (queda como `PENDIENTE`).
+- obtener informacion del usuario para el JWT (id, rol y estado de acceso).
+
+### `src/`
+
+Arquitectura hexagonal para los dominios de asignaciones y usuarios.
+
+- `src/core/domain`: entidades (`User`, con enums `Role` y `AccessStatus`) y contratos de repositorio.
+- `src/core/application`: casos de uso (`GetAssignmentById`, `SaveStudentResponse`, `SubmitStudentAssignment`, `ListUsers`, `UpdateUserAccess`) y DTOs con validacion Zod.
+- `src/infrastructure/persistence`: implementaciones Prisma de los repositorios.
 
 ### `prisma/`
 

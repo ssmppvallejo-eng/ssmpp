@@ -61,6 +61,13 @@ La aplicacion tiene dos superficies principales:
 1. `landing`: pagina publica y acceso a Google Sign-In.
 2. `app`: area privada donde un usuario ve y responde actividades asignadas.
 
+## Control de acceso
+
+- Cualquier cuenta de Google puede iniciar sesion; al hacerlo por primera vez queda registrada con `accessStatus: PENDIENTE`.
+- Solo las cuentas con `accessStatus: APROBADO` pueden entrar a `/app` y consumir la API. Las cuentas pendientes o rechazadas son redirigidas a `/landing/accounts/status`.
+- Un `ADMINISTRADOR` aprueba/rechaza cuentas y asigna roles desde `/app/admin/users`.
+- El primer administrador se siembra manualmente en la base de datos (actualizar `role` a `ADMINISTRADOR` en la tabla `User`).
+
 La base de datos esta organizada alrededor de:
 
 - Usuarios y roles.
@@ -71,8 +78,7 @@ La base de datos esta organizada alrededor de:
 
 ## Advertencias actuales
 
-- Algunas rutas usan `assignment` en lugar de `assignment`.
-- Hay inconsistencias entre `active` y `valid` en autenticacion.
-- El flujo de guardar respuestas no esta conectado de punta a punta.
-- Existen endpoints incompletos o con referencias a modelos antiguos.
+- Los flujos de crear asignaciones, revision del evaluador (juicios de valor) y CRUD de la taxonomia aun no existen.
+- La carga de archivos de evidencia no tiene mecanismo de subida.
+- No hay pruebas automatizadas.
 - El README original de Next.js fue reemplazado por esta guia del proyecto.

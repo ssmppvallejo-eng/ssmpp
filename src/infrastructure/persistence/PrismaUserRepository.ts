@@ -3,6 +3,16 @@ import { User, Role } from "../../core/domain/entities/User";
 import { IUserRepository } from "../../core/domain/repository/IUserRepository";
 
 export class PrismaUserRepository implements IUserRepository {
+  async findAll(): Promise<User[]> {
+    const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
+    return users as User[];
+  }
+
+  async findByIds(ids: number[]): Promise<User[]> {
+    const users = await prisma.user.findMany({ where: { id: { in: ids } } });
+    return users as User[];
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const user = await prisma.user.findUnique({ where: { email } });
     return user as User | null;
@@ -21,7 +31,7 @@ export class PrismaUserRepository implements IUserRepository {
         name: data.name,
         image: data.image,
         role: data.role as any,
-        active: data.active,
+        accessStatus: data.accessStatus as any,
       },
     });
     return user as User;

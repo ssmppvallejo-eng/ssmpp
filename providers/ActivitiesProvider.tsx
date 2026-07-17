@@ -108,10 +108,13 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
 
             data.Judgement.forEach((j) => {
                 j.Indicators.forEach((i) => {
-                    fillState.descriptors[i.id] = {
-                        assignmentIndicatorId: null,
-                        descriptorId: null,
-                        valueAssigned: null,
+                    // Estado keyed por AssignmentIndicator.id, prellenado con la
+                    // respuesta ya guardada para no perder seleccion al recargar.
+                    fillState.descriptors[i.assignmentIndicatorId] = {
+                        assignmentIndicatorId: i.savedResponse ? i.assignmentIndicatorId : null,
+                        descriptorId: i.savedResponse?.descriptorId ?? null,
+                        valueAssigned: i.savedResponse?.valueAssigned ?? null,
+                        comment: i.savedResponse?.comment ?? null,
                     };
                 });
             });

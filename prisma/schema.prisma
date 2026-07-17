@@ -69,10 +69,11 @@ model Component {
 }
 
 model Indicator {
-  description String
-  code        String                @unique
-  id          Int                   @id @default(autoincrement())
-  judgementId Int
+  description   String
+  code          String                @unique
+  justification String?
+  id            Int                   @id @default(autoincrement())
+  judgementId   Int
   assignments AssignmentIndicator[]
   descriptors Descriptor[]
   judgement   Judgement             @relation(fields: [judgementId], references: [id])
@@ -128,7 +129,7 @@ model TemplateIndicator {
 model User {
   email         String             @unique
   role          Role               @default(ESTUDIANTE)
-  active        Boolean            @default(false)
+  accessStatus  AccessStatus       @default(PENDIENTE)
   id            Int                @id @default(autoincrement())
   image         String?
   name          String?
@@ -177,6 +178,12 @@ enum Level {
   MAESTRIAS
   DOCTORADOS
   ESPECIALIDADES_MEDICAS
+}
+
+enum AccessStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
 }
 
 enum Role {
