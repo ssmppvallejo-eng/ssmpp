@@ -1,5 +1,4 @@
-import { authOptions } from '../../../../lib/auth';
-import { getServerSession } from 'next-auth';
+import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { Role } from '../../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { SaveAssignmentResponseSchema } from '../../../../src/core/application/dtos/AssignmentDTO';
@@ -21,10 +20,8 @@ export async function GET(
     const assignmentId = Number(id);
 
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
+        const { session, error } = await requireApprovedSession();
+        if (error) return error;
 
         const assignment = await getAssignmentUseCase.execute(session.user.id, assignmentId);
         return NextResponse.json(assignment);
@@ -51,16 +48,10 @@ export async function POST(
 ) {
     const { id } = await context.params;
     const assignmentId = Number(id);
-    const session = await getServerSession(authOptions);
-    
-    try {
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
 
-        if (session.user.role !== Role.ESTUDIANTE) {
-            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-        }
+    try {
+        const { session, error } = await requireApprovedSession([Role.ESTUDIANTE]);
+        if (error) return error;
 
         const json = await request.json();
         const body = SaveAssignmentResponseSchema.parse(json);

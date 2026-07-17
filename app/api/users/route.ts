@@ -1,21 +1,18 @@
-import { prisma } from '../../../lib/prisma';
-import { authOptions } from '../../../lib/auth';
-import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireApprovedSession } from '../../../lib/apiAuth';
+import { Role } from '../../../src/core/domain/entities/User';
+import { ListUsersUseCase } from '../../../src/core/application/use-cases/ListUsers';
+import { PrismaUserRepository } from '../../../src/infrastructure/persistence/PrismaUserRepository';
+
+const repository = new PrismaUserRepository();
+const listUsersUseCase = new ListUsersUseCase(repository);
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        if (error) return error;
 
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
-        if (!session.user.role) {
-            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-        }
-
-        const users = await prisma.user.findMany();
+        const users = await listUsersUseCase.execute();
 
         return NextResponse.json(users);
 

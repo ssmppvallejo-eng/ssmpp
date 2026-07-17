@@ -1,5 +1,4 @@
-import { authOptions } from "../../../../../lib/auth";
-import { getServerSession } from "next-auth";
+import { requireApprovedSession } from "../../../../../lib/apiAuth";
 import { NextRequest, NextResponse } from "next/server";
 import { Role } from "../../../../../src/core/domain/entities/User";
 import { SubmitStudentAssignmentUseCase } from "../../../../../src/core/application/use-cases/SubmitStudentAssignment";
@@ -16,14 +15,8 @@ export async function POST(
     const assignmentId = Number(id);
 
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
-        if (session.user.role !== Role.ESTUDIANTE) {
-            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-        }
+        const { session, error } = await requireApprovedSession([Role.ESTUDIANTE]);
+        if (error) return error;
 
         const result = await submitAssignmentUseCase.execute(session.user.id, assignmentId);
         return NextResponse.json(result);

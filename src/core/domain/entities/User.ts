@@ -6,11 +6,17 @@ export enum Role {
   EVALUADOR = 'EVALUADOR',
 }
 
+export enum AccessStatus {
+  PENDIENTE = 'PENDIENTE',
+  APROBADO = 'APROBADO',
+  RECHAZADO = 'RECHAZADO',
+}
+
 export interface User {
   id: number;
   email: string;
   name?: string | null;
   image?: string | null;
   role: Role;
-  active: boolean;
+  accessStatus: AccessStatus;
 }

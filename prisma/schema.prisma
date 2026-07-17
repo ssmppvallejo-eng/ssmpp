@@ -128,7 +128,7 @@ model TemplateIndicator {
 model User {
   email         String             @unique
   role          Role               @default(ESTUDIANTE)
-  active        Boolean            @default(false)
+  accessStatus  AccessStatus       @default(PENDIENTE)
   id            Int                @id @default(autoincrement())
   image         String?
   name          String?
@@ -177,6 +177,12 @@ enum Level {
   MAESTRIAS
   DOCTORADOS
   ESPECIALIDADES_MEDICAS
+}
+
+enum AccessStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
 }
 
 enum Role {

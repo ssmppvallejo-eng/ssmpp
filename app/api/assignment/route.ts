@@ -1,22 +1,15 @@
 import { prisma } from '../../../lib/prisma';
-import { authOptions } from '../../../lib/auth';
-import { getServerSession } from 'next-auth';
+import { requireApprovedSession } from '../../../lib/apiAuth';
+import { Role } from '../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
+        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        if (error) return error;
 
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
-        if (session.user.role === 'ADMINISTRADOR') {
-            const assignments = await prisma.assignment.findMany();
-            return NextResponse.json(assignments);
-        }
-
-        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+        const assignments = await prisma.assignment.findMany();
+        return NextResponse.json(assignments);
 
     } catch (error: any) {
         return NextResponse.json({
