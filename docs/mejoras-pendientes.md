@@ -1,12 +1,8 @@
 # Mejoras pendientes
 
-Lista alineada con el SRS (Especificacion de Requerimientos v1.0). Lo ya completado: migracion a TypeScript, guardado/envio de respuestas del estudiante, y el flujo de login y control de acceso (aprobacion de cuentas, roles y panel de administracion de usuarios).
+Lista alineada con el SRS (Especificacion de Requerimientos v1.0). Lo ya completado: migracion a TypeScript, guardado/envio de respuestas del estudiante, el flujo de login y control de acceso (aprobacion de cuentas, roles y panel de administracion de usuarios) y la creacion de asignaciones por indicador o por plantilla.
 
 ## Prioridad alta (Must del SRS)
-
-### Creacion de asignaciones
-
-Un administrador debe poder crear asignaciones "por indicador o por plantilla" y asignarlas a uno o mas usuarios. Hoy las asignaciones solo pueden crearse directamente en la base de datos.
 
 ### Flujo del evaluador
 

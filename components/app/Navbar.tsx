@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { BsListTask } from "react-icons/bs";
-import { FiHome, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
+import { FiClipboard, FiHome, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
 
 const menuSections = [
     { title: "Actividades", href: "/app", icon: BsListTask },
@@ -13,6 +13,7 @@ const menuSections = [
 
 const adminSections = [
     { title: "Usuarios", href: "/app/admin/users", icon: FiUsers },
+    { title: "Asignaciones", href: "/app/admin/assignments", icon: FiClipboard },
 ];
 
 export default function Navbar() {

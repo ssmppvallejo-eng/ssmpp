@@ -30,7 +30,24 @@ Responsabilidades:
 
 ### `api/assignment`
 
-`GET` (solo `ADMINISTRADOR`): lista todas las asignaciones.
+`GET` (solo `ADMINISTRADOR`): lista todas las asignaciones con dimension, creador, usuarios asignados y conteo de indicadores.
+
+`POST` (solo `ADMINISTRADOR`): crea una asignacion. Body validado con Zod (`CreateAssignmentSchema`):
+
+- `dimensionId`: dimension a evaluar;
+- `dueDate`: fecha de vencimiento (`submissionDate`);
+- `userIds`: usuarios responsables (deben existir y estar aprobados);
+- `indicatorIds` **o** `templateId` (exclusivos entre si): indicadores elegidos manualmente o tomados de una plantilla.
+
+`CreateAssignmentUseCase` valida que la dimension exista, que los indicadores existan y pertenezcan a la dimension, y crea `Assignment`, `AssignmentIndicator` y `UserAssignTo` en una sola transaccion.
+
+### `api/dimensions`
+
+`GET` (solo `ADMINISTRADOR`): catalogo jerarquico dimension -> componentes -> criterios -> indicadores, usado por el formulario de creacion de asignaciones.
+
+### `api/templates`
+
+`GET` (solo `ADMINISTRADOR`): lista plantillas con su posgrado y conteo de indicadores.
 
 ### `api/assignment/my`
 

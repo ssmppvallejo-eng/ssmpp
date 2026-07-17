@@ -1,5 +1,5 @@
 import { prisma } from "../../../lib/prisma";
-import { IAssignmentRepository } from "../../core/domain/repository/IAssignmentRepository";
+import { CreateAssignmentData, IAssignmentRepository } from "../../core/domain/repository/IAssignmentRepository";
 import { SaveAssignmentResponseDTO } from "../../core/application/dtos/AssignmentDTO";
 
 export class PrismaAssignmentRepository implements IAssignmentRepository {
@@ -143,6 +143,81 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
         return await prisma.assignment.update({
             where: { id: assignmentId },
             data: { status: "ENVIADO" },
+        });
+    }
+
+    async findAllWithDetails(): Promise<any[]> {
+        return await prisma.assignment.findMany({
+            orderBy: { id: "desc" },
+            include: {
+                dimension: {
+                    select: { code: true, title: true },
+                },
+                owner: {
+                    select: { name: true, email: true },
+                },
+                assignedUsers: {
+                    select: {
+                        user: {
+                            select: { id: true, name: true, email: true, image: true },
+                        },
+                    },
+                },
+                _count: {
+                    select: { indicators: true },
+                },
+            },
+        });
+    }
+
+    async dimensionExists(dimensionId: number): Promise<boolean> {
+        const dimension = await prisma.dimension.findUnique({
+            where: { id: dimensionId },
+            select: { id: true },
+        });
+        return !!dimension;
+    }
+
+    async getTemplateIndicatorIds(templateId: number): Promise<number[] | null> {
+        const template = await prisma.template.findUnique({
+            where: { id: templateId },
+            select: {
+                indicators: { select: { indicatorId: true } },
+            },
+        });
+
+        if (!template) return null;
+        return template.indicators.map((entry) => entry.indicatorId);
+    }
+
+    async countIndicatorsInDimension(indicatorIds: number[], dimensionId: number): Promise<number> {
+        return await prisma.indicator.count({
+            where: {
+                id: { in: indicatorIds },
+                judgement: { component: { dimensionId } },
+            },
+        });
+    }
+
+    async createAssignment(data: CreateAssignmentData): Promise<any> {
+        // Los creates anidados corren en una sola transaccion de Prisma.
+        return await prisma.assignment.create({
+            data: {
+                ownerId: data.ownerId,
+                dimensionId: data.dimensionId,
+                assignmentDate: new Date(),
+                submissionDate: data.dueDate,
+                indicators: {
+                    create: data.indicatorIds.map((indicatorId) => ({ indicatorId })),
+                },
+                assignedUsers: {
+                    create: data.userIds.map((userId) => ({ userId })),
+                },
+            },
+            include: {
+                dimension: { select: { code: true, title: true } },
+                _count: { select: { indicators: true, assignedUsers: true } },
+            },
         });
     }
 }

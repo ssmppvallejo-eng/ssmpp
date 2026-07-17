@@ -41,7 +41,20 @@ Flujo:
 
 El primer administrador se siembra manualmente en la base de datos (columna `role` de la tabla `User`).
 
-## 4. Listado de actividades
+## 4. Creacion de asignaciones (administrador)
+
+La pantalla `/app/admin/assignments` lista las asignaciones existentes y `/app/admin/assignments/new` permite crear nuevas (RF "Asignacion de una asignacion").
+
+Flujo:
+
+1. `AssignmentCreator` carga el catalogo (`/api/dimensions`), las plantillas (`/api/templates`) y los usuarios aprobados (`/api/users`).
+2. El administrador elige una dimension.
+3. Define los indicadores en uno de dos modos: **por indicador** (checkboxes agrupados por componente y criterio) o **por plantilla**.
+4. Define la fecha de vencimiento (`submissionDate`) y selecciona uno o mas usuarios aprobados.
+5. `POST /api/assignment` valida con Zod y ejecuta `CreateAssignmentUseCase`, que verifica dimension, pertenencia de los indicadores a la dimension y aprobacion de los usuarios.
+6. Se crean `Assignment` (status `PENDIENTE`, `assignmentDate` = hoy), sus `AssignmentIndicator` y los `UserAssignTo` en una transaccion.
+
+## 5. Listado de actividades
 
 La pantalla `/app` usa `ActivitiesProvider`.
 
@@ -54,7 +67,7 @@ Flujo actual:
 5. `PreActivities` renderiza la lista.
 6. Cada item navega hacia `app/assignment/:id`.
 
-## 5. Detalle de actividad
+## 6. Detalle de actividad
 
 La pantalla `/app/assignment/[id]` carga una actividad especifica.
 
@@ -69,7 +82,7 @@ Flujo actual:
 7. Reorganiza indicadores por criterio (`Judgement`).
 8. Devuelve una estructura preparada para el frontend.
 
-## 6. Responder y enviar la rubrica
+## 7. Responder y enviar la rubrica
 
 Flujo actual:
 
@@ -83,7 +96,7 @@ Pendiente:
 
 - adjuntar evidencia documental (no hay mecanismo de subida de archivos).
 
-## 7. Revision
+## 8. Revision
 
 El modelo tiene roles como `COORDINADOR`, `PROFESOR` y `EVALUADOR`, ademas de estados como `EN_REVISION` y `COMPLETADO`.
 
