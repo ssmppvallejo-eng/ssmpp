@@ -12,13 +12,13 @@ interface IndicatorProps {
 
 export default function Indicator({ ind }: IndicatorProps) {
     const { assignmentState, assignmentDispatch, saveResponse } = useActivity();
-    const descriptorState = assignmentState.descriptors[ind.id];
+    const descriptorState = assignmentState.descriptors[ind.assignmentIndicatorId];
 
     const [dropRubric, setDropRubric] = useState(true);
     const toggleAll = () => {
         setDropRubric(prev => !prev);
     }
-    const [comment, setComment] = useState('');
+    const [comment, setComment] = useState(() => descriptorState?.comment ?? '');
     const debounceComment = useDebounce(comment, 1200);
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -28,11 +28,12 @@ export default function Indicator({ ind }: IndicatorProps) {
     useEffect(() => {
         if (!debounceComment) return;
         if (!descriptorState) return;
+        if (descriptorState.comment === debounceComment) return;
 
         assignmentDispatch({
             type: "SET_COMMENT",
             payload: {
-                assignmentIndicatorId: ind.id,
+                assignmentIndicatorId: ind.assignmentIndicatorId,
                 comment: debounceComment
             }
         });
@@ -40,13 +41,13 @@ export default function Indicator({ ind }: IndicatorProps) {
         // Trigger save whenever comment changes, including the selected descriptor
         if (descriptorState.descriptorId) {
             saveResponse(
-                ind.id,
+                ind.assignmentIndicatorId,
                 descriptorState.descriptorId,
                 descriptorState.valueAssigned || 0,
                 debounceComment
             );
         }
-    }, [debounceComment, assignmentDispatch, descriptorState, ind.id, saveResponse]);
+    }, [debounceComment, assignmentDispatch, descriptorState, ind.assignmentIndicatorId, saveResponse]);
 
     return (
         <article className="px-5 py-6">
@@ -82,7 +83,7 @@ export default function Indicator({ ind }: IndicatorProps) {
                             ind.descriptors?.length > 0 &&
                             ind.descriptors.map(d =>
                                 <Descriptor key={d.id} descriptor={d} dropRubric={dropRubric}
-                                    indicatorId={ind.id} selected={descriptorState?.descriptorId === d.id} dispatch={assignmentDispatch}
+                                    assignmentIndicatorId={ind.assignmentIndicatorId} selected={descriptorState?.descriptorId === d.id} dispatch={assignmentDispatch}
                                 />
                             )
                         }

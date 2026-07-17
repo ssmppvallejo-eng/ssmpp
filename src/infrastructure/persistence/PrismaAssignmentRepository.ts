@@ -55,6 +55,7 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                 },
                 indicators: {
                     select: {
+                        id: true,
                         indicator: {
                             select: {
                                 id: true,
@@ -76,6 +77,13 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                                         description: true
                                     }
                                 }
+                            }
+                        },
+                        descriptorAssignments: {
+                            select: {
+                                descriptorId: true,
+                                valueAssigned: true,
+                                comment: true,
                             }
                         }
                     }
@@ -106,6 +114,14 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                 },
             },
         });
+    }
+
+    async verifyIndicatorInAssignment(assignmentIndicatorId: number, assignmentId: number): Promise<boolean> {
+        const assignmentIndicator = await prisma.assignmentIndicator.findFirst({
+            where: { id: assignmentIndicatorId, assignmentId },
+            select: { id: true },
+        });
+        return !!assignmentIndicator;
     }
 
     async verifyOwnership(assignmentId: number, userId: number): Promise<boolean> {

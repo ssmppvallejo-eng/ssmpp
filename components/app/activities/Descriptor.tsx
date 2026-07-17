@@ -7,23 +7,23 @@ import { useActivity } from "../../../providers/ActivitiesProvider";
 interface DescriptorProps {
     descriptor: DescriptorType;
     dropRubric: boolean;
-    indicatorId: number;
+    assignmentIndicatorId: number;
     selected: boolean;
     dispatch: any; // We could type this better if we wanted to
 }
 
-export default function Descriptor({ descriptor, dropRubric, indicatorId, selected, dispatch }: DescriptorProps) {
+export default function Descriptor({ descriptor, dropRubric, assignmentIndicatorId, selected, dispatch }: DescriptorProps) {
     const { saveResponse, assignmentState } = useActivity();
     const [option, setOption] = useState<any>(null);
     const debounceDescriptor = useDebounce(option, 2000);
 
     const handleClick = () => {
         const payload = {
-            assignmentIndicatorId: indicatorId,
+            assignmentIndicatorId,
             descriptorId: descriptor.id,
             valueAssigned: descriptor.value,
         };
-        
+
         setOption(payload);
 
         dispatch({
@@ -34,9 +34,9 @@ export default function Descriptor({ descriptor, dropRubric, indicatorId, select
 
     useEffect(() => {
         if (!debounceDescriptor) return;
-        
+
         // Get the current comment from state if it exists
-        const currentComment = assignmentState.descriptors[indicatorId]?.comment;
+        const currentComment = assignmentState.descriptors[assignmentIndicatorId]?.comment;
 
         saveResponse(
             debounceDescriptor.assignmentIndicatorId,
@@ -45,7 +45,7 @@ export default function Descriptor({ descriptor, dropRubric, indicatorId, select
             currentComment || undefined
         );
 
-    }, [debounceDescriptor, indicatorId, saveResponse, assignmentState.descriptors]);
+    }, [debounceDescriptor, assignmentIndicatorId, saveResponse, assignmentState.descriptors]);
 
     return (
         <button

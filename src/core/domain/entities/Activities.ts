@@ -7,11 +7,20 @@ export interface Descriptor {
   value: number;
 }
 
+export interface SavedResponse {
+  descriptorId: number;
+  valueAssigned: number;
+  comment?: string | null;
+}
+
 export interface Indicator {
   id: number;
+  /** Id del indicador dentro de la asignacion (AssignmentIndicator.id); se usa para guardar respuestas. */
+  assignmentIndicatorId: number;
   code: string;
   description: string;
   descriptors: Descriptor[];
+  savedResponse?: SavedResponse | null;
 }
 
 export interface Judgement {
