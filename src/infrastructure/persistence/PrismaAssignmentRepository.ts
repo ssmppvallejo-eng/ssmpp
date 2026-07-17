@@ -179,8 +179,80 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                         },
                     },
                 },
+                indicators: {
+                    select: {
+                        descriptorAssignments: {
+                            where: { complete: true },
+                            select: { id: true },
+                            take: 1,
+                        },
+                    },
+                },
                 _count: {
                     select: { indicators: true },
+                },
+            },
+        });
+    }
+
+    async findAssignmentForReview(id: number): Promise<any | null> {
+        return await prisma.assignment.findUnique({
+            where: { id },
+            include: {
+                dimension: {
+                    select: { code: true, title: true, description: true },
+                },
+                owner: {
+                    select: { name: true, email: true },
+                },
+                assignedUsers: {
+                    select: {
+                        user: {
+                            select: { id: true, name: true, email: true, image: true },
+                        },
+                    },
+                },
+                indicators: {
+                    select: {
+                        id: true,
+                        indicator: {
+                            select: {
+                                id: true,
+                                code: true,
+                                description: true,
+                                justification: true,
+                                descriptors: {
+                                    orderBy: { value: "asc" },
+                                    select: {
+                                        id: true,
+                                        title: true,
+                                        description: true,
+                                        value: true,
+                                    },
+                                },
+                                judgement: {
+                                    select: {
+                                        id: true,
+                                        code: true,
+                                        title: true,
+                                        description: true,
+                                    },
+                                },
+                            },
+                        },
+                        descriptorAssignments: {
+                            select: {
+                                descriptorId: true,
+                                valueAssigned: true,
+                                comment: true,
+                                evaluationValue: true,
+                                note: true,
+                                evidenceName: true,
+                                evidenceUrl: true,
+                                complete: true,
+                            },
+                        },
+                    },
                 },
             },
         });

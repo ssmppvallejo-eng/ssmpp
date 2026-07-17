@@ -17,6 +17,7 @@ export interface IAssignmentRepository {
     getAssignmentCompletion(assignmentId: number): Promise<{ totalIndicators: number; answeredIndicators: number }>;
     submitAssignment(assignmentId: number): Promise<any>;
     findAllWithDetails(): Promise<any[]>;
+    findAssignmentForReview(id: number): Promise<any | null>;
     dimensionExists(dimensionId: number): Promise<boolean>;
     getTemplateIndicatorIds(templateId: number): Promise<number[] | null>;
     countIndicatorsInDimension(indicatorIds: number[], dimensionId: number): Promise<number>;

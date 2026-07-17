@@ -54,7 +54,15 @@ Flujo:
 5. `POST /api/assignment` valida con Zod y ejecuta `CreateAssignmentUseCase`, que verifica dimension, pertenencia de los indicadores a la dimension y aprobacion de los usuarios.
 6. Se crean `Assignment` (status `PENDIENTE`, `assignmentDate` = hoy), sus `AssignmentIndicator` y los `UserAssignTo` en una transaccion.
 
-## 5. Listado de actividades
+## 5. Supervision de asignaciones (administrador/coordinador)
+
+Desde `/app/admin/assignments` cada fila enlaza a `/app/admin/assignments/:id`, la vista de revision (RF-ASIG-010):
+
+1. `AssignmentReview` consulta `GET /api/assignment/:id/review` (roles `ADMINISTRADOR` y `COORDINADOR`).
+2. Se muestra el resumen (estado, avance de indicadores respondidos, fechas, responsables) y la jerarquia completa por criterio.
+3. Por indicador se ve la justificacion normativa, los 3 descriptores con el seleccionado resaltado, el comentario y la evidencia del evaluado, y el juicio de valor del evaluador cuando exista.
+
+## 6. Listado de actividades
 
 La pantalla `/app` usa `ActivitiesProvider`.
 
@@ -67,7 +75,7 @@ Flujo actual:
 5. `PreActivities` renderiza la lista.
 6. Cada item navega hacia `app/assignment/:id`.
 
-## 6. Detalle de actividad
+## 7. Detalle de actividad
 
 La pantalla `/app/assignment/[id]` carga una actividad especifica.
 
@@ -82,7 +90,7 @@ Flujo actual:
 7. Reorganiza indicadores por criterio (`Judgement`).
 8. Devuelve una estructura preparada para el frontend.
 
-## 7. Responder y enviar la rubrica
+## 8. Responder y enviar la rubrica
 
 Flujo actual:
 
@@ -96,7 +104,7 @@ Pendiente:
 
 - adjuntar evidencia documental (no hay mecanismo de subida de archivos).
 
-## 8. Revision
+## 9. Revision
 
 El modelo tiene roles como `COORDINADOR`, `PROFESOR` y `EVALUADOR`, ademas de estados como `EN_REVISION` y `COMPLETADO`.
 

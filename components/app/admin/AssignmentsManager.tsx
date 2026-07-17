@@ -12,6 +12,7 @@ interface AssignmentRow {
     dimension: { code: string; title: string };
     owner: { name?: string | null; email: string };
     assignedUsers: { user: { id: number; name?: string | null; email: string } }[];
+    progress: { total: number; answered: number };
     _count: { indicators: number };
 }
 
@@ -96,7 +97,7 @@ export default function AssignmentsManager() {
                             <tr className="border-b border-zinc-200 text-xs font-semibold uppercase text-zinc-500">
                                 <th className="px-4 py-3">Evaluación</th>
                                 <th className="px-4 py-3">Estado</th>
-                                <th className="px-4 py-3">Indicadores</th>
+                                <th className="px-4 py-3">Avance</th>
                                 <th className="px-4 py-3">Asignada</th>
                                 <th className="px-4 py-3">Vence</th>
                                 <th className="px-4 py-3">Usuarios</th>
@@ -104,21 +105,33 @@ export default function AssignmentsManager() {
                         </thead>
                         <tbody>
                             {assignments.map((assignment) => (
-                                <tr key={assignment.id} className="border-b border-zinc-100 last:border-b-0">
+                                <tr key={assignment.id} className="border-b border-zinc-100 last:border-b-0 transition hover:bg-zinc-50">
                                     <td className="px-4 py-3">
-                                        <p className="font-semibold text-zinc-950">
-                                            {assignment.dimension.code} · {assignment.dimension.title}
-                                        </p>
-                                        <p className="text-xs text-zinc-500">
-                                            Creada por {assignment.owner.name ?? assignment.owner.email}
-                                        </p>
+                                        <Link href={`/app/admin/assignments/${assignment.id}`} className="group block">
+                                            <p className="font-semibold text-zinc-950 transition group-hover:text-sky-800">
+                                                {assignment.dimension.code} · {assignment.dimension.title}
+                                            </p>
+                                            <p className="text-xs text-zinc-500">
+                                                Creada por {assignment.owner.name ?? assignment.owner.email}
+                                            </p>
+                                        </Link>
                                     </td>
                                     <td className="px-4 py-3">
                                         <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[assignment.status] ?? STATUS_STYLES.PENDIENTE}`}>
                                             {assignment.status.replace("_", " ")}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-zinc-700">{assignment._count.indicators}</td>
+                                    <td className="px-4 py-3">
+                                        <p className="text-xs font-semibold text-zinc-700">
+                                            {assignment.progress.answered} / {assignment.progress.total}
+                                        </p>
+                                        <div className="mt-1.5 h-1.5 w-24 overflow-hidden rounded-full bg-zinc-100">
+                                            <div
+                                                className="h-full rounded-full bg-sky-700"
+                                                style={{ width: `${assignment.progress.total === 0 ? 0 : Math.round((assignment.progress.answered / assignment.progress.total) * 100)}%` }}
+                                            />
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-3 text-zinc-700">{formatDate(assignment.assignmentDate)}</td>
                                     <td className="px-4 py-3 text-zinc-700">{formatDate(assignment.submissionDate)}</td>
                                     <td className="px-4 py-3">
