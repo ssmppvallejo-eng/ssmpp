@@ -29,8 +29,8 @@ El SRS agrega el rol "Actores externos" (egresados, empleadores), similar a estu
 
 ## Prioridad baja (Should/Could del SRS)
 
-- Reporte PDF por asignacion.
 - Dashboard con grafica por indicadores.
+- Resumen ejecutivo generado con IA en el reporte de evaluacion.
 - Historial de edicion del instrumento.
 - Filtrar por posgrado y por rol.
 - Pruebas automatizadas (autorizacion de endpoints, guardado de respuestas, transformaciones de datos).

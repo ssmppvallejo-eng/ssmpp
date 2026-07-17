@@ -61,6 +61,7 @@ Desde `/app/admin/assignments` cada fila enlaza a `/app/admin/assignments/:id`, 
 1. `AssignmentReview` consulta `GET /api/assignment/:id/review` (roles `ADMINISTRADOR` y `COORDINADOR`).
 2. Se muestra el resumen (estado, avance de indicadores respondidos, fechas, responsables) y la jerarquia completa por criterio.
 3. Por indicador se ve la justificacion normativa, los 3 descriptores con el seleccionado resaltado, el comentario y la evidencia del evaluado, y el juicio de valor del evaluador cuando exista.
+4. El boton "Reporte" abre `/app/admin/assignments/:id/report`: un reporte imprimible (boton "Imprimir / Guardar como PDF") con resumen de resultados (puntaje de logro por criterio y global, promedio de juicios del evaluador, nivel de logro segun la escala 1-3) y el detalle de cada indicador con autoevaluacion, juicio, comentarios y observaciones. Tambien accesible para el evaluador desde su panel cuando la evaluacion esta completada.
 
 ## 6. Listado de actividades
 

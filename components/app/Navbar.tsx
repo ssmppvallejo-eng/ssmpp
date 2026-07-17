@@ -34,7 +34,7 @@ export default function Navbar() {
     const roleBadge = session?.user.role ? ROLE_BADGES[session.user.role] : null;
 
     return (
-        <aside className="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-zinc-200 bg-white px-4 py-5 lg:flex lg:flex-col">
+        <aside className="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-zinc-200 bg-white px-4 py-5 print:hidden lg:flex lg:flex-col">
             <Link href="/app" className="flex items-center gap-3 rounded-md px-2 py-2">
                 <Image src="/logo.svg" alt="Logo" width={44} height={44} className="size-11" />
                 <div>

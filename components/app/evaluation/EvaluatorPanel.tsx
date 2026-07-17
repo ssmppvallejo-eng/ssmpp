@@ -200,9 +200,17 @@ export default function EvaluatorPanel({ assignmentId }: { assignmentId: string 
                     Revisa la respuesta de cada indicador y emite tu juicio de valor numérico (1–3) y textual.
                 </p>
                 {readOnly && (
-                    <p className="mt-4 inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
-                        Esta evaluación ya fue completada; los juicios se muestran en modo lectura.
-                    </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                        <p className="inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
+                            Esta evaluación ya fue completada; los juicios se muestran en modo lectura.
+                        </p>
+                        <Link
+                            href={`/app/admin/assignments/${assignmentId}/report`}
+                            className="inline-flex h-10 items-center rounded-md border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:border-sky-700 hover:text-sky-800"
+                        >
+                            Ver reporte de evaluación
+                        </Link>
+                    </div>
                 )}
             </header>
 

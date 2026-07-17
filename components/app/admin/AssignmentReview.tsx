@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { FiArrowLeft, FiBookOpen, FiCheckCircle, FiFileText, FiMessageSquare, FiUser, FiUserPlus } from "react-icons/fi";
+import { FiArrowLeft, FiBookOpen, FiCheckCircle, FiFileText, FiMessageSquare, FiPrinter, FiUser, FiUserPlus } from "react-icons/fi";
 
 interface ReviewDescriptor {
     id: number;
@@ -203,9 +203,18 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
                             </p>
                         )}
                     </div>
-                    <span className={`inline-flex shrink-0 rounded-full border px-3 py-1.5 text-sm font-semibold ${STATUS_STYLES[assignment.status] ?? STATUS_STYLES.PENDIENTE}`}>
-                        {assignment.status.replace("_", " ")}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-3">
+                        <Link
+                            href={`/app/admin/assignments/${assignmentId}/report`}
+                            className="inline-flex h-10 items-center gap-2 rounded-md border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:border-sky-700 hover:text-sky-800"
+                        >
+                            <FiPrinter className="size-4" />
+                            Reporte
+                        </Link>
+                        <span className={`inline-flex rounded-full border px-3 py-1.5 text-sm font-semibold ${STATUS_STYLES[assignment.status] ?? STATUS_STYLES.PENDIENTE}`}>
+                            {assignment.status.replace("_", " ")}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
