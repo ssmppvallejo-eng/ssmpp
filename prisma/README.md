@@ -14,6 +14,16 @@ Define:
 - datasource PostgreSQL,
 - generador de Prisma Client.
 
+### `seed.mjs`
+
+Siembra el catalogo con el instrumento **SICVPP-BUAP v1** (5 dimensiones, 10 componentes, 16 criterios, 41 indicadores, 123 descriptores):
+
+```bash
+npm run db:seed
+```
+
+ADVERTENCIA: el seed reemplaza todo el catalogo y elimina las asignaciones existentes, porque dependen del catalogo anterior.
+
 ### `migrations/`
 
 Contiene la historia de cambios de base de datos.
@@ -53,7 +63,7 @@ Esto importa porque un `Indicator` es parte de la rubrica general, pero `Assignm
 
 ## Pendientes del schema
 
-- Revisar si `AssignmentIndicatorDescriptor` necesita una llave unica compuesta por `assignmentIndicatorId` y `descriptorId`.
-- Corregir typo `comment`.
-- Confirmar si `valueAssigned` representa la respuesta del usuario o un valor copiado del descriptor.
-- Definir como se manejaran evidencias: nombre, URL, almacenamiento y permisos.
+- Agregar el estado `NO_COMPLETADO` al enum `IndicatorStatus` (expiracion por fecha limite).
+- Agregar el rol `ACTORES_EXTERNOS` al enum `Role`.
+- Definir como se manejaran evidencias: almacenamiento de archivos y permisos.
+- Agregar un campo que registre el momento del envio (hoy `submissionDate` es la fecha limite).

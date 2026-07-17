@@ -2,6 +2,8 @@
 
 El modelo Prisma describe una rubrica de evaluacion y su asignacion a usuarios.
 
+El catalogo (dimensiones a descriptores) corresponde al instrumento **SICVPP-BUAP v1** ("Sistema de Indicadores Contextualizados para Valorar la Pertinencia de los Programas de Posgrado de la BUAP", 16-05-2026): 5 dimensiones, 10 componentes, 16 criterios, 41 indicadores y 123 descriptores. Se siembra con `npm run db:seed` (ver `prisma/seed.mjs`).
+
 ## Estructura academica
 
 ### `Dimension`
@@ -33,7 +35,13 @@ Relaciones:
 
 ### `Indicator`
 
-Representa un indicador evaluable.
+Representa un indicador evaluable (evidencia empirico-observable).
+
+Campos importantes:
+
+- `code`
+- `description`
+- `justification`: justificacion normativa del indicador (leyes y lineamientos que lo sustentan).
 
 Relaciones:
 
@@ -44,7 +52,11 @@ Relaciones:
 
 ### `Descriptor`
 
-Representa una opcion o nivel de respuesta para un indicador.
+Representa un nivel de logro para un indicador. Cada indicador tiene exactamente 3 descriptores con ponderaciones unicas (RF-DES-015):
+
+- `value: 1` — No logrado
+- `value: 2` — En proceso
+- `value: 3` — Plenamente logrado
 
 Campos importantes:
 

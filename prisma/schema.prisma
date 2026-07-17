@@ -69,10 +69,11 @@ model Component {
 }
 
 model Indicator {
-  description String
-  code        String                @unique
-  id          Int                   @id @default(autoincrement())
-  judgementId Int
+  description   String
+  code          String                @unique
+  justification String?
+  id            Int                   @id @default(autoincrement())
+  judgementId   Int
   assignments AssignmentIndicator[]
   descriptors Descriptor[]
   judgement   Judgement             @relation(fields: [judgementId], references: [id])
