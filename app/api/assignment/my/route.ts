@@ -1,11 +1,16 @@
 import { prisma } from '../../../../lib/prisma';
 import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaAssignmentRepository } from '../../../../src/infrastructure/persistence/PrismaAssignmentRepository';
+
+const repository = new PrismaAssignmentRepository();
 
 export async function GET(request: NextRequest) {
     try {
         const { session, error } = await requireApprovedSession();
         if (error) return error;
+
+        await repository.expireOverdueAssignments();
 
         // La pertenencia se define por UserAssignTo, sin importar el rol:
         // quien fue asignado a una actividad puede verla.
@@ -18,6 +23,7 @@ export async function GET(request: NextRequest) {
                     select: {
                         assignmentDate: true,
                         submissionDate: true,
+                        submittedAt: true,
                         status: true,
                         dimension: {
                             select: {
@@ -39,7 +45,8 @@ export async function GET(request: NextRequest) {
                 description: ass.assignment?.dimension?.description ?? "",
                 status: ass.assignment.status,
                 assignmentDate: ass.assignment.assignmentDate,
-                submissionDate: ass.assignment.submissionDate
+                submissionDate: ass.assignment.submissionDate,
+                submittedAt: ass.assignment.submittedAt
             };
         });
 

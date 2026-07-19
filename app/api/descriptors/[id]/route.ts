@@ -1,6 +1,7 @@
 import { prisma } from '../../../../lib/prisma';
 import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { catalogErrorResponse } from '../../../../lib/catalogErrors';
+import { logInstrumentEdit } from '../../../../lib/instrumentLog';
 import { Role } from '../../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -20,7 +21,7 @@ export async function PATCH(
     const descriptorId = Number(id);
 
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         if (!Number.isInteger(descriptorId)) {
@@ -32,6 +33,11 @@ export async function PATCH(
         const descriptor = await prisma.descriptor.update({
             where: { id: descriptorId },
             data: body,
+        });
+
+        await logInstrumentEdit({
+            session, entityType: "DESCRIPTOR", entityId: descriptor.id, entityCode: `valor ${descriptor.value}`,
+            action: "UPDATE", changes: body,
         });
 
         return NextResponse.json(descriptor);

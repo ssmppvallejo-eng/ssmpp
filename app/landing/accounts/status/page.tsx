@@ -40,7 +40,7 @@ export default function AccountStatus() {
                 <div className="flex items-center gap-3">
                     <Image src="/logo.svg" alt="Logo" width={48} height={48} className="size-12" />
                     <span className="hidden text-sm font-semibold leading-5 text-zinc-950 sm:block">
-                        SSMPP
+                        SICVPP-BUAP
                     </span>
                 </div>
             </div>
@@ -79,7 +79,7 @@ export default function AccountStatus() {
             </div>
 
             <p className="text-center text-xs text-zinc-500">
-                © 2026 Sistema de seguimiento académico.
+                © 2026 SICVPP-BUAP · Benemérita Universidad Autónoma de Puebla.
             </p>
         </main>
     );

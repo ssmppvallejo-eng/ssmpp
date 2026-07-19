@@ -74,7 +74,8 @@ Campos importantes:
 
 - `ownerId`
 - `assignmentDate`
-- `submissionDate`
+- `submissionDate`: fecha limite/cierre (se fija al crear la asignacion).
+- `submittedAt`: momento real en que el evaluado envio la actividad (`null` mientras no se envie).
 - `status`
 - `dimensionId`
 
@@ -149,6 +150,14 @@ Plantilla de indicadores asociada a un posgrado.
 
 Une templates con indicadores.
 
+### `EvidenceFile`
+
+Almacena el archivo binario de una evidencia documental subida por un evaluado (RF-IND-005). `AssignmentIndicatorDescriptor.evidenceUrl` apunta a `/api/evidence/:id`.
+
+### `InstrumentEditLog`
+
+Bitacora de cambios al instrumento (dimensiones, componentes, criterios, indicadores, descriptores). No usa llaves foraneas hacia las entidades del catalogo porque estas pueden eliminarse; el registro queda como evidencia historica con `entityType`, `entityId`, `entityCode`, `action` (`CREATE`/`UPDATE`/`DELETE`), `changes` (JSON) y quien hizo el cambio.
+
 ## Estados y roles
 
 ### Estados de asignacion
@@ -172,10 +181,11 @@ Une templates con indicadores.
 - `COORDINADOR`
 - `PROFESOR`
 - `EVALUADOR`
+- `ACTORES_EXTERNOS`: egresados, empleadores y sector productivo regional. Se comporta como `ESTUDIANTE`/`PROFESOR` para responder actividades (la pertenencia se define por `UserAssignTo`, no por rol).
 
 ## Riesgos del modelo actual
 
-- `submissionDate` es la fecha limite/cierre de la asignacion (se fija al crearla), no la fecha en que el estudiante envio. No existe todavia un campo que registre el momento del envio.
+- `submissionDate` es la fecha limite/cierre de la asignacion (se fija al crearla); `submittedAt` registra el momento real del envio.
 - El enum de estados aun no incluye `NO_COMPLETADO` (expiracion por fecha limite), previsto en el SRS.
 - La tabla `Judgement` almacena criterios de la rubrica; no confundir con el "juicio de valor" del evaluador, que vive en `evaluationValue` y `note` de `AssignmentIndicatorDescriptor`.
 - Hay migraciones antiguas con nombres previos como `Assigment`, `Subsystem` y `Answer`, lo que explica parte de la mezcla de nombres en el codigo.

@@ -54,11 +54,33 @@ Rutas `POST /api/{components|judgements|indicators}` y `PATCH`/`DELETE /api/{dim
 - codigos unicos por nivel (`409` si se repite);
 - el padre debe existir (`404` si no);
 - crear un indicador exige exactamente 3 descriptores; sus ponderaciones se fijan en 1, 2 y 3 (RF-DES-015) y de los descriptores solo se editan titulo y descripcion;
-- eliminar exige ir de abajo hacia arriba: un registro con hijos o usado en asignaciones responde `409`.
+- eliminar exige ir de abajo hacia arriba: un registro con hijos o usado en asignaciones responde `409`;
+- cada operacion exitosa registra una entrada en `InstrumentEditLog` via `lib/instrumentLog.ts` (best-effort: un fallo al loguear no revierte el CRUD).
+
+### `api/instrument/history`
+
+`GET` (solo `ADMINISTRADOR`): lista paginada (50 por pagina) de la bitacora de cambios al instrumento. Filtros opcionales `entityType` (`DIMENSION`/`COMPONENT`/`JUDGEMENT`/`INDICATOR`/`DESCRIPTOR`) y `action` (`CREATE`/`UPDATE`/`DELETE`), y `page`.
 
 ### `api/templates`
 
-`GET` (solo `ADMINISTRADOR`): lista plantillas con su posgrado y conteo de indicadores.
+Solo `ADMINISTRADOR`:
+
+- `GET`: lista plantillas con posgrado, ids de indicadores y conteo.
+- `POST`: crea una plantilla (nombre, descripcion opcional, posgrado existente y al menos un indicador).
+- `PATCH /api/templates/[id]`: edita datos y/o reemplaza el conjunto de indicadores.
+- `DELETE /api/templates/[id]`: elimina la plantilla y sus vinculos con indicadores.
+
+### `api/postgraduates`
+
+Solo `ADMINISTRADOR`:
+
+- `GET`: lista posgrados con conteo de plantillas y usuarios.
+- `POST` / `PATCH /[id]`: crea/edita (titulo, nivel, area de conocimiento).
+- `DELETE /[id]`: elimina el posgrado y sus vinculos con usuarios; si tiene plantillas responde `409`.
+
+### `api/users/[id]/postgraduates`
+
+`PUT` (solo `ADMINISTRADOR`): reemplaza el conjunto de posgrados a los que pertenece un usuario (`UserPostgraduate`).
 
 ### `api/assignment/my`
 
@@ -82,6 +104,22 @@ Flujo:
 
 `POST` (solo `ESTUDIANTE`): guarda la respuesta de un indicador (descriptor seleccionado y comentario). Body validado con Zod (`SaveAssignmentResponseSchema`). Hace upsert en `AssignmentIndicatorDescriptor` mediante `SaveStudentResponseUseCase`.
 
+`PATCH` (solo `ADMINISTRADOR`): edita la fecha limite (`dueDate`) y/o reemplaza los usuarios asignados (`userIds`, deben estar aprobados).
+
+`DELETE` (solo `ADMINISTRADOR`): elimina la asignacion con sus respuestas, juicios, vinculos y archivos de evidencia.
+
+### `api/assignment/[id]/evidence`
+
+`POST` (miembro de la asignacion, con la actividad en `PENDIENTE`/`EN_PROCESO`): sube evidencia documental (RF-IND-005) como `multipart/form-data` (`file` + `assignmentIndicatorId`). Tipos permitidos: PDF, PNG, JPG, DOC(X), XLS(X); maximo 5 MB. Requiere que el indicador ya tenga descriptor seleccionado. El archivo se guarda en la BD (`EvidenceFile`) y reemplaza a la evidencia anterior si existia.
+
+### `api/evidence/[id]`
+
+`GET`: descarga una evidencia. Permitido para administradores/coordinadores y para cualquier usuario asignado a la evaluacion correspondiente.
+
+### `api/dashboard`
+
+`GET` (solo `ADMINISTRADOR`): metricas agregadas — asignaciones por estado, usuarios aprobados por rol, y promedio de logro (autoevaluacion y juicio del evaluador) por dimension y por indicador.
+
 ### `api/assignment/[id]/review`
 
 `GET` (solo `ADMINISTRADOR` y `COORDINADOR`): vista de supervision (RF-ASIG-010). Devuelve la jerarquia completa de la asignacion con, por indicador: justificacion normativa, los 3 descriptores, la respuesta capturada (descriptor, comentario, evidencia) y el juicio de valor del evaluador cuando exista, ademas de progreso, responsables y fechas. No exige pertenencia.
@@ -92,7 +130,7 @@ Flujo:
 
 - valida ownership (`403`);
 - valida que todos los indicadores tengan respuesta (`409` si estan incompletos);
-- marca la asignacion como `ENVIADO`.
+- marca la asignacion como `ENVIADO` y registra `submittedAt` (fecha real de envio; distinta de `submissionDate`, que es la fecha limite).
 
 ### `api/assignment/[id]/evaluators`
 

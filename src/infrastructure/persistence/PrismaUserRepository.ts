@@ -4,8 +4,15 @@ import { IUserRepository } from "../../core/domain/repository/IUserRepository";
 
 export class PrismaUserRepository implements IUserRepository {
   async findAll(): Promise<User[]> {
-    const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
-    return users as User[];
+    const users = await prisma.user.findMany({
+      orderBy: { id: "asc" },
+      include: {
+        postgraduates: {
+          select: { postgraduate: { select: { id: true, title: true } } },
+        },
+      },
+    });
+    return users as unknown as User[];
   }
 
   async findByIds(ids: number[]): Promise<User[]> {

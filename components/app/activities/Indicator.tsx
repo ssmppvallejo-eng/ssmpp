@@ -11,7 +11,7 @@ interface IndicatorProps {
 }
 
 export default function Indicator({ ind }: IndicatorProps) {
-    const { assignmentState, assignmentDispatch, saveResponse } = useActivity();
+    const { assignmentState, assignmentDispatch, saveResponse, activity } = useActivity();
     const descriptorState = assignmentState.descriptors[ind.assignmentIndicatorId];
 
     const [dropRubric, setDropRubric] = useState(true);
@@ -20,6 +20,46 @@ export default function Indicator({ ind }: IndicatorProps) {
     }
     const [comment, setComment] = useState(() => descriptorState?.comment ?? '');
     const debounceComment = useDebounce(comment, 1200);
+
+    const [evidence, setEvidence] = useState<{ name: string; url: string } | null>(() =>
+        ind.savedResponse?.evidenceUrl
+            ? { name: ind.savedResponse.evidenceName ?? "Evidencia", url: ind.savedResponse.evidenceUrl }
+            : null
+    );
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file || !activity.id || uploading) return;
+
+        setUploading(true);
+        setUploadError(null);
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("assignmentIndicatorId", String(ind.assignmentIndicatorId));
+
+            const response = await fetch(`/api/assignment/${activity.id}/evidence`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const body = await response.json().catch(() => null);
+                throw new Error(body?.message ?? "No se pudo subir la evidencia");
+            }
+
+            const uploaded = await response.json();
+            setEvidence({ name: uploaded.evidenceName, url: uploaded.evidenceUrl });
+        } catch (error) {
+            setUploadError(error instanceof Error ? error.message : "Error inesperado");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setComment(event.target.value);
@@ -113,21 +153,47 @@ export default function Indicator({ ind }: IndicatorProps) {
                                 Evidencia
                             </span>
                             <p className="mt-2 text-sm leading-6 text-zinc-600">
-                                Adjunte un archivo si el indicador lo requiere.
+                                {descriptorState?.descriptorId
+                                    ? "Adjunte un archivo si el indicador lo requiere (PDF, imagen u ofimática, máx. 5 MB)."
+                                    : "Seleccione primero un descriptor para poder adjuntar evidencia."}
                             </p>
+
+                            {evidence && (
+                                <a
+                                    href={evidence.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-3 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
+                                >
+                                    <FiFileText className="size-4 shrink-0" />
+                                    <span className="truncate">{evidence.name}</span>
+                                </a>
+                            )}
+
                             <label
-                                htmlFor={`file-upload-${ind.id}`}
-                                className="mt-3 flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-zinc-300 bg-white px-3 text-center text-sm font-semibold text-zinc-600 transition hover:border-sky-700 hover:text-sky-800"
+                                htmlFor={`file-upload-${ind.assignmentIndicatorId}`}
+                                className={`mt-3 flex h-20 flex-col items-center justify-center rounded-md border border-dashed px-3 text-center text-sm font-semibold transition ${
+                                    descriptorState?.descriptorId && !uploading
+                                        ? "cursor-pointer border-zinc-300 bg-white text-zinc-600 hover:border-sky-700 hover:text-sky-800"
+                                        : "cursor-not-allowed border-zinc-200 bg-zinc-50 text-zinc-400"
+                                }`}
                             >
-                                <FiFileText className="mb-2 size-5" />
-                                Seleccionar archivo
+                                <FiFileText className="mb-1.5 size-5" />
+                                {uploading ? "Subiendo..." : evidence ? "Reemplazar archivo" : "Seleccionar archivo"}
                             </label>
 
                             <input
-                                id={`file-upload-${ind.id}`}
+                                id={`file-upload-${ind.assignmentIndicatorId}`}
                                 type="file"
+                                accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx"
+                                disabled={!descriptorState?.descriptorId || uploading}
+                                onChange={handleFileChange}
                                 className="hidden"
                             />
+
+                            {uploadError && (
+                                <p className="mt-2 text-xs font-medium text-red-700">{uploadError}</p>
+                            )}
                         </div>
                     </div>
                 </section>

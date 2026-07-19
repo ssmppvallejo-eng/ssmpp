@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FiChevronDown, FiChevronRight, FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import { FiChevronDown, FiChevronRight, FiClock, FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 
 interface CatalogDescriptor {
     id: number;
@@ -249,14 +250,23 @@ export default function InstrumentManager() {
                         descriptores de logro. Cada indicador mantiene exactamente 3 descriptores con ponderaciones 1–3.
                     </p>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => openForm({ kind: "dimension", mode: "create", heading: "Nueva dimensión" })}
-                    className="inline-flex h-11 items-center gap-2 rounded-md bg-sky-700 px-4 text-sm font-semibold text-white transition hover:bg-sky-800"
-                >
-                    <FiPlus className="size-4" />
-                    Nueva dimensión
-                </button>
+                <div className="flex shrink-0 items-center gap-3">
+                    <Link
+                        href="/app/admin/instrument/history"
+                        className="inline-flex h-11 items-center gap-2 rounded-md border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:border-sky-700 hover:text-sky-800"
+                    >
+                        <FiClock className="size-4" />
+                        Historial
+                    </Link>
+                    <button
+                        type="button"
+                        onClick={() => openForm({ kind: "dimension", mode: "create", heading: "Nueva dimensión" })}
+                        className="inline-flex h-11 items-center gap-2 rounded-md bg-sky-700 px-4 text-sm font-semibold text-white transition hover:bg-sky-800"
+                    >
+                        <FiPlus className="size-4" />
+                        Nueva dimensión
+                    </button>
+                </div>
             </header>
 
             {errorMessage && (

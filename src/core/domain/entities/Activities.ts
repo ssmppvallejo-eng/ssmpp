@@ -11,6 +11,8 @@ export interface SavedResponse {
   descriptorId: number;
   valueAssigned: number;
   comment?: string | null;
+  evidenceName?: string | null;
+  evidenceUrl?: string | null;
 }
 
 export interface Indicator {
@@ -35,6 +37,7 @@ export interface Assignment {
   id: number;
   assignmentDate?: string | null;
   submissionDate?: string | null;
+  submittedAt?: string | null;
   status: string;
   Dimension?: {
     code: string;

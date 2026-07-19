@@ -61,6 +61,7 @@ Desde `/app/admin/assignments` cada fila enlaza a `/app/admin/assignments/:id`, 
 1. `AssignmentReview` consulta `GET /api/assignment/:id/review` (roles `ADMINISTRADOR` y `COORDINADOR`).
 2. Se muestra el resumen (estado, avance de indicadores respondidos, fechas, responsables) y la jerarquia completa por criterio.
 3. Por indicador se ve la justificacion normativa, los 3 descriptores con el seleccionado resaltado, el comentario y la evidencia del evaluado, y el juicio de valor del evaluador cuando exista.
+4. El boton "Reporte" abre `/app/admin/assignments/:id/report`: un reporte imprimible (boton "Imprimir / Guardar como PDF") con resumen de resultados (puntaje de logro por criterio y global, promedio de juicios del evaluador, nivel de logro segun la escala 1-3) y el detalle de cada indicador con autoevaluacion, juicio, comentarios y observaciones. Tambien accesible para el evaluador desde su panel cuando la evaluacion esta completada.
 
 ## 6. Listado de actividades
 
@@ -98,11 +99,9 @@ Flujo actual:
 2. Los cambios se guardan con autoguardado mediante `POST /api/assignment/:id`, que ejecuta `SaveStudentResponseUseCase` y hace upsert en `AssignmentIndicatorDescriptor`.
 3. Al terminar, el usuario envia la actividad con `POST /api/assignment/:id/submit`.
 4. `SubmitStudentAssignmentUseCase` valida ownership y completitud: si hay indicadores sin responder, responde `409`.
-5. Si todo esta completo, la asignacion pasa a estado `ENVIADO`.
+5. Si todo esta completo, la asignacion pasa a estado `ENVIADO` y se registra `submittedAt` con el momento real del envio (distinto de `submissionDate`, que es la fecha limite fijada al crear la asignacion).
 
-Pendiente:
-
-- adjuntar evidencia documental (no hay mecanismo de subida de archivos).
+6. Con un descriptor seleccionado, el evaluado puede adjuntar evidencia documental (`POST /api/assignment/:id/evidence`, PDF/imagen/ofimatica, max. 5 MB); el archivo se guarda en la BD y se descarga via `/api/evidence/:id`.
 
 ## 9. Revision (evaluador)
 
@@ -118,4 +117,10 @@ Reglas relacionadas del ciclo de estados (RF-SIS-007):
 - La primera respuesta guardada mueve la asignacion de `PENDIENTE` a `EN_PROCESO`.
 - Despues del envio, el evaluado ya no puede modificar respuestas (`409`).
 
-Pendiente: estado `NO_COMPLETADO` por expiracion de la fecha limite.
+Expiracion: al consultar listados o detalles, las asignaciones `PENDIENTE`/`EN_PROCESO`/`EN_REVISION` cuya fecha limite ya vencio pasan automaticamente a `NO_COMPLETADO` y dejan de aceptar respuestas.
+
+## 10. Historial de edicion del instrumento (administrador)
+
+Cada alta, edicion o eliminacion en el CRUD del instrumento (dimensiones, componentes, criterios, indicadores, descriptores) queda registrada por `lib/instrumentLog.ts` en la tabla `InstrumentEditLog`, con el tipo y codigo de la entidad, la accion, los campos modificados, y quien y cuando la hizo.
+
+Desde `/app/admin/instrument`, el boton "Historial" abre `/app/admin/instrument/history` (`GET /api/instrument/history`, paginado, filtrable por nivel y por accion), donde cada fila es expandible para ver el detalle de los cambios.

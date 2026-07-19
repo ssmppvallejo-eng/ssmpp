@@ -1,6 +1,7 @@
 import { prisma } from '../../../lib/prisma';
 import { requireApprovedSession } from '../../../lib/apiAuth';
 import { catalogErrorResponse } from '../../../lib/catalogErrors';
+import { logInstrumentEdit } from '../../../lib/instrumentLog';
 import { Role } from '../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -20,7 +21,7 @@ const CreateIndicatorSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         const body = CreateIndicatorSchema.parse(await request.json());
@@ -45,6 +46,11 @@ export async function POST(request: NextRequest) {
                 },
             },
             include: { descriptors: true },
+        });
+
+        await logInstrumentEdit({
+            session, entityType: "INDICATOR", entityId: indicator.id, entityCode: indicator.code,
+            action: "CREATE", changes: body,
         });
 
         return NextResponse.json(indicator, { status: 201 });

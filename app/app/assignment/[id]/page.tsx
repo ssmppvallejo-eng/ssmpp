@@ -122,13 +122,10 @@ export default  function AssignmentPage () {
                                 {submitMessage}
                             </p>
                         )}
-                        <button
-                            type="button"
-                            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-700 transition hover:border-sky-700 hover:text-sky-800"
-                        >
-                            <FiSave />
-                            Guardar avance
-                        </button>
+                        <p className="inline-flex h-11 items-center gap-2 text-sm text-zinc-500">
+                            <FiSave className="size-4" />
+                            Tus respuestas se guardan automáticamente
+                        </p>
                         <button
                             type="button"
                             onClick={handleSubmit}

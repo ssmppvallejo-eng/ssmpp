@@ -22,6 +22,9 @@ model Assignment {
   ownerId        Int
   assignmentDate DateTime?
   submissionDate DateTime?
+  // Momento real en que el evaluado envio la actividad; submissionDate
+  // sigue siendo la fecha limite (ver docs/modelo-datos.md).
+  submittedAt    DateTime?
   status         IndicatorStatus       @default(PENDIENTE)
   dimensionId    Int
   dimension      Dimension             @relation(fields: [dimensionId], references: [id])
@@ -147,6 +150,32 @@ model UserAssignTo {
   @@id([assignmentId, userId])
 }
 
+model EvidenceFile {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
+// Bitacora de cambios al instrumento (dimensiones, componentes, criterios,
+// indicadores y descriptores). No usa FKs porque los registros editados
+// pueden eliminarse despues; el snapshot queda igual como evidencia historica.
+model InstrumentEditLog {
+  id         Int              @id @default(autoincrement())
+  entityType InstrumentEntity
+  entityId   Int
+  entityCode String?
+  action     InstrumentAction
+  changes    Json?
+  userId     Int?
+  userEmail  String?
+  createdAt  DateTime         @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
 model UserPostgraduate {
   userId         Int
   postgraduateId Int
@@ -171,6 +200,7 @@ enum IndicatorStatus {
   ENVIADO
   EN_REVISION
   COMPLETADO
+  NO_COMPLETADO
 }
 
 enum Level {
@@ -192,4 +222,19 @@ enum Role {
   COORDINADOR
   PROFESOR
   EVALUADOR
+  ACTORES_EXTERNOS
+}
+
+enum InstrumentEntity {
+  DIMENSION
+  COMPONENT
+  JUDGEMENT
+  INDICATOR
+  DESCRIPTOR
+}
+
+enum InstrumentAction {
+  CREATE
+  UPDATE
+  DELETE
 }

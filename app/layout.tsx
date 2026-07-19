@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SSMPP Evaluaciones",
-  description: "Sistema de evaluaciones de posgrado",
+  title: "SICVPP-BUAP · Evaluación de pertinencia de posgrados",
+  description: "Sistema de Indicadores Contextualizados para Valorar la Pertinencia de los Programas de Posgrado de la BUAP",
 };
 
 export default function RootLayout({

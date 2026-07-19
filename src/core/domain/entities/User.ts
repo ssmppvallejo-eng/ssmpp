@@ -4,6 +4,7 @@ export enum Role {
   COORDINADOR = 'COORDINADOR',
   PROFESOR = 'PROFESOR',
   EVALUADOR = 'EVALUADOR',
+  ACTORES_EXTERNOS = 'ACTORES_EXTERNOS',
 }
 
 export enum AccessStatus {

@@ -8,6 +8,11 @@ export interface CreateAssignmentData {
     userIds: number[];
 }
 
+export interface UpdateAssignmentData {
+    dueDate?: Date;
+    userIds?: number[];
+}
+
 export interface IAssignmentRepository {
     saveDescriptorResponse(data: SaveAssignmentResponseDTO): Promise<any>;
     findAssignmentById(id: number): Promise<any | null>;
@@ -27,4 +32,7 @@ export interface IAssignmentRepository {
     getTemplateIndicatorIds(templateId: number): Promise<number[] | null>;
     countIndicatorsInDimension(indicatorIds: number[], dimensionId: number): Promise<number>;
     createAssignment(data: CreateAssignmentData): Promise<any>;
+    updateAssignment(assignmentId: number, data: UpdateAssignmentData): Promise<any>;
+    deleteAssignment(assignmentId: number): Promise<void>;
+    expireOverdueAssignments(): Promise<number>;
 }

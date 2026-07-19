@@ -9,6 +9,7 @@ export class GetAssignmentForReviewUseCase {
     constructor(private readonly assignmentRepository: IAssignmentRepository) {}
 
     async execute(assignmentId: number) {
+        await this.assignmentRepository.expireOverdueAssignments();
         const dbAssignment = await this.assignmentRepository.findAssignmentForReview(assignmentId);
 
         if (!dbAssignment) {
@@ -54,6 +55,7 @@ export class GetAssignmentForReviewUseCase {
             status: dbAssignment.status,
             assignmentDate: dbAssignment.assignmentDate,
             submissionDate: dbAssignment.submissionDate,
+            submittedAt: dbAssignment.submittedAt,
             dimension: dbAssignment.dimension,
             owner: dbAssignment.owner,
             assignedUsers: dbAssignment.assignedUsers.map((entry: any) => entry.user),

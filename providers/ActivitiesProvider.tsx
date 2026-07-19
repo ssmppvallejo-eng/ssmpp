@@ -30,9 +30,13 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
         try {
             const request = '/api/assignment/my';
             const response = await fetch(request);
+            if (!response.ok) {
+                throw new Error(`No se pudieron obtener las actividades (${response.status})`);
+            }
             const data = await response.json();
 
-            setPreActivities(data);
+            // Blindaje: si la API devolviera algo que no es lista, no romper la UI.
+            setPreActivities(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Ocurrio algo inesperado al momento de hacer fetch a las PREactividades: ", error);
         } finally {

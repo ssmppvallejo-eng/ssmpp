@@ -1,43 +1,26 @@
 # Mejoras pendientes
 
-Lista alineada con el SRS (Especificacion de Requerimientos v1.0). Lo ya completado: migracion a TypeScript, flujo completo del evaluado (responder/enviar), login y control de acceso, creacion de asignaciones (por indicador o plantilla), vista de supervision admin/coordinador (RF-ASIG-010), flujo del evaluador con juicios de valor (RF-ASIG-009, estados hasta COMPLETADO) y CRUD del instrumento (RF-DIM-011 a RF-COM-017 y RF-DES-015).
+Lista alineada con el SRS (Especificacion de Requerimientos v1.0).
 
-## Prioridad alta (Must del SRS)
+**Completado**: todos los Must del SRS — control de acceso y usuarios (incluido el rol `ACTORES_EXTERNOS`), flujo del evaluado (responder con autoguardado, evidencia documental y envio con fecha real de envio `submittedAt`), creacion/edicion/eliminacion de asignaciones (por indicador o plantilla), vistas por rol (RF-ASIG-008/009/010), juicios de valor del evaluador, ciclo completo de estados (incluida la expiracion `NO_COMPLETADO`), CRUD del instrumento (RF-DIM-011 a RF-COM-017, RF-DES-015), posgrados/plantillas/vinculos usuario-posgrado y sugerencia de evaluadores por programa. De los Should: reporte imprimible por asignacion, dashboard con graficas por dimension/indicador, filtros por rol/estado/posgrado/dimension, e historial de edicion del instrumento. Ademas: navegacion movil y branding SICVPP-BUAP.
 
-### Gestion de plantillas y posgrados
+## Pendiente
 
-El modo "por plantilla" del creador de asignaciones existe, pero no hay UI para crear plantillas ni posgrados (de los que dependen), ni para vincular usuarios a posgrados (`UserPostgraduate`). Tambien es prerequisito del filtro por posgrado.
+### Resumen ejecutivo con IA (solicitud del director)
 
-### Ciclo de vida completo de estados
+Generar en el reporte un resumen y recomendaciones a partir de los agregados del dashboard y los comentarios/juicios capturados (requiere API key de Anthropic).
 
-- Agregar `NO_COMPLETADO` al enum de estados.
-- Logica de expiracion cuando `submissionDate` (fecha limite) se vence.
+### Despliegue
 
-## Prioridad media
+Publicar en Vercel: variables de entorno, dominio autorizado en Google OAuth (`NEXTAUTH_URL`), y verificar respaldos de la BD en Neon.
 
-### Evidencia documental
+### Pruebas automatizadas
 
-RF-IND-005 pide adjuntar evidencia cuando el indicador lo requiera. No hay mecanismo de subida de archivos; definir almacenamiento (S3, blob de Vercel, etc.).
-
-### Registrar el momento de envio
-
-`submissionDate` es la fecha limite, no la fecha de envio. Agregar un campo para registrar cuando el estudiante envio la actividad.
-
-### Rol de actores externos
-
-El SRS agrega el rol "Actores externos" (egresados, empleadores), similar a estudiante/profesor. Falta en el enum `Role`.
+Tests de los casos de uso (autorizacion, guardado, expiracion, juicios) — la arquitectura hexagonal ya los deja aislados.
 
 ### Tipado de repositorios
 
-`PrismaAssignmentRepository` devuelve `Promise<any>` en varios metodos. Tipar los retornos con las entidades de `src/core/domain/entities/` al ir tocando esos archivos.
-
-## Prioridad baja (Should/Could del SRS)
-
-- Reporte PDF por asignacion.
-- Dashboard con grafica por indicadores.
-- Historial de edicion del instrumento.
-- Filtrar por posgrado y por rol.
-- Pruebas automatizadas (autorizacion de endpoints, guardado de respuestas, transformaciones de datos).
+`PrismaAssignmentRepository` devuelve `Promise<any>` en varios metodos; tipar al ir tocando esos archivos.
 
 ## Fuera de alcance (Won't del SRS)
 
