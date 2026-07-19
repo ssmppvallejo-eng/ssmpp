@@ -263,15 +263,21 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
 
     async expireOverdueAssignments(): Promise<number> {
         // RF-SIS-007: las evaluaciones no enviadas ni completadas cuya fecha
-        // limite ya vencio pasan a NO_COMPLETADO.
-        const result = await prisma.assignment.updateMany({
-            where: {
-                submissionDate: { lt: new Date() },
-                status: { in: ["PENDIENTE", "EN_PROCESO", "EN_REVISION"] },
-            },
-            data: { status: "NO_COMPLETADO" },
-        });
-        return result.count;
+        // limite ya vencio pasan a NO_COMPLETADO. Es una operacion de
+        // mantenimiento: si falla, no debe tumbar la consulta que la disparo.
+        try {
+            const result = await prisma.assignment.updateMany({
+                where: {
+                    submissionDate: { lt: new Date() },
+                    status: { in: ["PENDIENTE", "EN_PROCESO", "EN_REVISION"] },
+                },
+                data: { status: "NO_COMPLETADO" },
+            });
+            return result.count;
+        } catch (error) {
+            console.error("Error expiring overdue assignments:", error);
+            return 0;
+        }
     }
 
     async findAllWithDetails(): Promise<any[]> {
