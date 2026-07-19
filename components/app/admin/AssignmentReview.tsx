@@ -47,6 +47,7 @@ interface ReviewAssignment {
     status: string;
     assignmentDate?: string | null;
     submissionDate?: string | null;
+    submittedAt?: string | null;
     dimension: { code: string; title: string; description?: string | null };
     owner: { name?: string | null; email: string };
     assignedUsers: { id: number; name?: string | null; email: string }[];
@@ -333,7 +334,7 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
                     </div>
                 </div>
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     <div className="rounded-md border border-zinc-200 bg-white px-4 py-3">
                         <p className="text-xs font-semibold uppercase text-zinc-500">Avance</p>
                         <p className="mt-1 text-lg font-semibold text-zinc-950">
@@ -350,6 +351,12 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
                     <div className="rounded-md border border-zinc-200 bg-white px-4 py-3">
                         <p className="text-xs font-semibold uppercase text-zinc-500">Vence</p>
                         <p className="mt-1 text-lg font-semibold text-zinc-950">{formatDate(assignment.submissionDate)}</p>
+                    </div>
+                    <div className="rounded-md border border-zinc-200 bg-white px-4 py-3">
+                        <p className="text-xs font-semibold uppercase text-zinc-500">Enviada</p>
+                        <p className="mt-1 text-lg font-semibold text-zinc-950">
+                            {assignment.submittedAt ? formatDate(assignment.submittedAt) : <span className="text-zinc-400">—</span>}
+                        </p>
                     </div>
                     <div className="rounded-md border border-zinc-200 bg-white px-4 py-3">
                         <p className="text-xs font-semibold uppercase text-zinc-500">Responsables</p>

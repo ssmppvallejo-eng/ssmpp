@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
                     select: {
                         assignmentDate: true,
                         submissionDate: true,
+                        submittedAt: true,
                         status: true,
                         dimension: {
                             select: {
@@ -44,7 +45,8 @@ export async function GET(request: NextRequest) {
                 description: ass.assignment?.dimension?.description ?? "",
                 status: ass.assignment.status,
                 assignmentDate: ass.assignment.assignmentDate,
-                submissionDate: ass.assignment.submissionDate
+                submissionDate: ass.assignment.submissionDate,
+                submittedAt: ass.assignment.submittedAt
             };
         });
 

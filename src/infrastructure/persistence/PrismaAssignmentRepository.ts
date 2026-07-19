@@ -104,6 +104,7 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                     select: {
                         assignmentDate: true,
                         submissionDate: true,
+                        submittedAt: true,
                         status: true,
                         dimension: {
                             select: {
@@ -158,7 +159,10 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
     }
 
     async submitAssignment(assignmentId: number): Promise<any> {
-        return await this.updateStatus(assignmentId, "ENVIADO");
+        return await prisma.assignment.update({
+            where: { id: assignmentId },
+            data: { status: "ENVIADO", submittedAt: new Date() },
+        });
     }
 
     async getAssignmentStatus(assignmentId: number): Promise<{ id: number; status: string } | null> {

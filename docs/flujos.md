@@ -99,7 +99,7 @@ Flujo actual:
 2. Los cambios se guardan con autoguardado mediante `POST /api/assignment/:id`, que ejecuta `SaveStudentResponseUseCase` y hace upsert en `AssignmentIndicatorDescriptor`.
 3. Al terminar, el usuario envia la actividad con `POST /api/assignment/:id/submit`.
 4. `SubmitStudentAssignmentUseCase` valida ownership y completitud: si hay indicadores sin responder, responde `409`.
-5. Si todo esta completo, la asignacion pasa a estado `ENVIADO`.
+5. Si todo esta completo, la asignacion pasa a estado `ENVIADO` y se registra `submittedAt` con el momento real del envio (distinto de `submissionDate`, que es la fecha limite fijada al crear la asignacion).
 
 6. Con un descriptor seleccionado, el evaluado puede adjuntar evidencia documental (`POST /api/assignment/:id/evidence`, PDF/imagen/ofimatica, max. 5 MB); el archivo se guarda en la BD y se descarga via `/api/evidence/:id`.
 
@@ -118,3 +118,9 @@ Reglas relacionadas del ciclo de estados (RF-SIS-007):
 - Despues del envio, el evaluado ya no puede modificar respuestas (`409`).
 
 Expiracion: al consultar listados o detalles, las asignaciones `PENDIENTE`/`EN_PROCESO`/`EN_REVISION` cuya fecha limite ya vencio pasan automaticamente a `NO_COMPLETADO` y dejan de aceptar respuestas.
+
+## 10. Historial de edicion del instrumento (administrador)
+
+Cada alta, edicion o eliminacion en el CRUD del instrumento (dimensiones, componentes, criterios, indicadores, descriptores) queda registrada por `lib/instrumentLog.ts` en la tabla `InstrumentEditLog`, con el tipo y codigo de la entidad, la accion, los campos modificados, y quien y cuando la hizo.
+
+Desde `/app/admin/instrument`, el boton "Historial" abre `/app/admin/instrument/history` (`GET /api/instrument/history`, paginado, filtrable por nivel y por accion), donde cada fila es expandible para ver el detalle de los cambios.

@@ -27,6 +27,7 @@ const ROLE_BADGES: Record<string, { label: string; gradient: string }> = {
     PROFESOR: { label: "Profesor", gradient: "from-amber-500 to-orange-500" },
     EVALUADOR: { label: "Evaluador", gradient: "from-emerald-600 to-teal-500" },
     ESTUDIANTE: { label: "Estudiante", gradient: "from-sky-700 to-indigo-600" },
+    ACTORES_EXTERNOS: { label: "Actor externo", gradient: "from-rose-500 to-pink-600" },
 };
 
 function NavContent() {

@@ -22,6 +22,7 @@ export class GetAssignmentByIdUseCase {
             id: dbAssignment.id,
             assignmentDate: dbAssignment.assignmentDate,
             submissionDate: dbAssignment.submissionDate,
+            submittedAt: dbAssignment.submittedAt,
             status: dbAssignment.status,
             Dimension: {
                 code: dbAssignment.dimension.code,

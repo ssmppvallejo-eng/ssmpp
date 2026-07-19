@@ -55,6 +55,7 @@ export class GetAssignmentForReviewUseCase {
             status: dbAssignment.status,
             assignmentDate: dbAssignment.assignmentDate,
             submissionDate: dbAssignment.submissionDate,
+            submittedAt: dbAssignment.submittedAt,
             dimension: dbAssignment.dimension,
             owner: dbAssignment.owner,
             assignedUsers: dbAssignment.assignedUsers.map((entry: any) => entry.user),

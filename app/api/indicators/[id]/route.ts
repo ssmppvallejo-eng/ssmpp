@@ -1,6 +1,7 @@
 import { prisma } from '../../../../lib/prisma';
 import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { catalogErrorResponse } from '../../../../lib/catalogErrors';
+import { logInstrumentEdit } from '../../../../lib/instrumentLog';
 import { Role } from '../../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -19,7 +20,7 @@ export async function PATCH(
     const indicatorId = Number(id);
 
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         if (!Number.isInteger(indicatorId)) {
@@ -31,6 +32,11 @@ export async function PATCH(
         const indicator = await prisma.indicator.update({
             where: { id: indicatorId },
             data: body,
+        });
+
+        await logInstrumentEdit({
+            session, entityType: "INDICATOR", entityId: indicator.id, entityCode: indicator.code,
+            action: "UPDATE", changes: body,
         });
 
         return NextResponse.json(indicator);
@@ -55,12 +61,14 @@ export async function DELETE(
     const indicatorId = Number(id);
 
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         if (!Number.isInteger(indicatorId)) {
             return NextResponse.json({ message: "Invalid id" }, { status: 400 });
         }
+
+        const existing = await prisma.indicator.findUnique({ where: { id: indicatorId }, select: { code: true, description: true } });
 
         // Los descriptores se eliminan junto con el indicador; si alguno esta
         // referido por respuestas de asignaciones, la transaccion falla (P2003).
@@ -68,6 +76,11 @@ export async function DELETE(
             prisma.descriptor.deleteMany({ where: { indicatorId } }),
             prisma.indicator.delete({ where: { id: indicatorId } }),
         ]);
+
+        await logInstrumentEdit({
+            session, entityType: "INDICATOR", entityId: indicatorId, entityCode: existing?.code,
+            action: "DELETE", changes: existing ?? undefined,
+        });
 
         return NextResponse.json({ ok: true });
 

@@ -43,6 +43,7 @@ interface ReportAssignment {
     status: string;
     assignmentDate?: string | null;
     submissionDate?: string | null;
+    submittedAt?: string | null;
     dimension: { code: string; title: string; description?: string | null };
     owner: { name?: string | null; email: string };
     assignedUsers: { id: number; name?: string | null; email: string }[];
@@ -225,6 +226,12 @@ export default function AssignmentReport({ assignmentId }: { assignmentId: strin
                     <div>
                         <p className="text-xs font-semibold uppercase text-zinc-500">Fecha límite</p>
                         <p className="text-zinc-800">{formatDate(assignment.submissionDate)}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold uppercase text-zinc-500">Fecha de envío</p>
+                        <p className="text-zinc-800">
+                            {assignment.submittedAt ? formatDate(assignment.submittedAt) : "—"}
+                        </p>
                     </div>
                     <div className="col-span-2 sm:col-span-2">
                         <p className="text-xs font-semibold uppercase text-zinc-500">Responsables</p>

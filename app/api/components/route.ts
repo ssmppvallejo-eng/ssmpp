@@ -1,6 +1,7 @@
 import { prisma } from '../../../lib/prisma';
 import { requireApprovedSession } from '../../../lib/apiAuth';
 import { catalogErrorResponse } from '../../../lib/catalogErrors';
+import { logInstrumentEdit } from '../../../lib/instrumentLog';
 import { Role } from '../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -14,7 +15,7 @@ const CreateComponentSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         const body = CreateComponentSchema.parse(await request.json());
@@ -31,6 +32,11 @@ export async function POST(request: NextRequest) {
                 title: body.title,
                 description: body.description ?? null,
             },
+        });
+
+        await logInstrumentEdit({
+            session, entityType: "COMPONENT", entityId: component.id, entityCode: component.code,
+            action: "CREATE", changes: body,
         });
 
         return NextResponse.json(component, { status: 201 });

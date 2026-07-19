@@ -9,6 +9,7 @@ interface AssignmentRow {
     status: string;
     assignmentDate?: string | null;
     submissionDate?: string | null;
+    submittedAt?: string | null;
     dimension: { code: string; title: string };
     owner: { name?: string | null; email: string };
     assignedUsers: { user: { id: number; name?: string | null; email: string } }[];
@@ -135,6 +136,7 @@ export default function AssignmentsManager() {
                                 <th className="px-4 py-3">Avance</th>
                                 <th className="px-4 py-3">Asignada</th>
                                 <th className="px-4 py-3">Vence</th>
+                                <th className="px-4 py-3">Enviada</th>
                                 <th className="px-4 py-3">Usuarios</th>
                             </tr>
                         </thead>
@@ -174,6 +176,11 @@ export default function AssignmentsManager() {
                                     </td>
                                     <td className="px-4 py-3 text-zinc-700">{formatDate(assignment.assignmentDate)}</td>
                                     <td className="px-4 py-3 text-zinc-700">{formatDate(assignment.submissionDate)}</td>
+                                    <td className="px-4 py-3 text-zinc-700">
+                                        {assignment.submittedAt
+                                            ? formatDate(assignment.submittedAt)
+                                            : <span className="text-zinc-400">—</span>}
+                                    </td>
                                     <td className="px-4 py-3">
                                         <div className="flex flex-col gap-0.5">
                                             {assignment.assignedUsers.map(({ user }) => (

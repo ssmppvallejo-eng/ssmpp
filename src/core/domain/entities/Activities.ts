@@ -37,6 +37,7 @@ export interface Assignment {
   id: number;
   assignmentDate?: string | null;
   submissionDate?: string | null;
+  submittedAt?: string | null;
   status: string;
   Dimension?: {
     code: string;

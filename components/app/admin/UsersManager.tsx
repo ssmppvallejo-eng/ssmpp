@@ -22,7 +22,7 @@ interface PostgraduateOption {
     title: string;
 }
 
-const ROLES = ["ADMINISTRADOR", "ESTUDIANTE", "COORDINADOR", "PROFESOR", "EVALUADOR"];
+const ROLES = ["ADMINISTRADOR", "ESTUDIANTE", "COORDINADOR", "PROFESOR", "EVALUADOR", "ACTORES_EXTERNOS"];
 
 const STATUS_STYLES: Record<AccessStatus, string> = {
     PENDIENTE: "bg-amber-50 text-amber-800 border-amber-200",

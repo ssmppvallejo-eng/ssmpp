@@ -1,6 +1,7 @@
 import { prisma } from '../../../../lib/prisma';
 import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { catalogErrorResponse } from '../../../../lib/catalogErrors';
+import { logInstrumentEdit } from '../../../../lib/instrumentLog';
 import { Role } from '../../../../src/core/domain/entities/User';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -19,7 +20,7 @@ export async function PATCH(
     const judgementId = Number(id);
 
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         if (!Number.isInteger(judgementId)) {
@@ -31,6 +32,11 @@ export async function PATCH(
         const judgement = await prisma.judgement.update({
             where: { id: judgementId },
             data: body,
+        });
+
+        await logInstrumentEdit({
+            session, entityType: "JUDGEMENT", entityId: judgement.id, entityCode: judgement.code,
+            action: "UPDATE", changes: body,
         });
 
         return NextResponse.json(judgement);
@@ -55,14 +61,22 @@ export async function DELETE(
     const judgementId = Number(id);
 
     try {
-        const { error } = await requireApprovedSession([Role.ADMINISTRADOR]);
+        const { session, error } = await requireApprovedSession([Role.ADMINISTRADOR]);
         if (error) return error;
 
         if (!Number.isInteger(judgementId)) {
             return NextResponse.json({ message: "Invalid id" }, { status: 400 });
         }
 
+        const existing = await prisma.judgement.findUnique({ where: { id: judgementId }, select: { code: true, title: true } });
+
         await prisma.judgement.delete({ where: { id: judgementId } });
+
+        await logInstrumentEdit({
+            session, entityType: "JUDGEMENT", entityId: judgementId, entityCode: existing?.code,
+            action: "DELETE", changes: existing ?? undefined,
+        });
+
         return NextResponse.json({ ok: true });
 
     } catch (error: any) {
