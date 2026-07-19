@@ -23,6 +23,9 @@ export interface Indicator {
   description: string;
   descriptors: Descriptor[];
   savedResponse?: SavedResponse | null;
+  /** RF-IND-005: si el indicador exige comentario y/o evidencia antes de enviar. */
+  requiresComment?: boolean;
+  requiresEvidence?: boolean;
 }
 
 export interface Judgement {

@@ -54,6 +54,7 @@ Rutas `POST /api/{components|judgements|indicators}` y `PATCH`/`DELETE /api/{dim
 - codigos unicos por nivel (`409` si se repite);
 - el padre debe existir (`404` si no);
 - crear un indicador exige exactamente 3 descriptores; sus ponderaciones se fijan en 1, 2 y 3 (RF-DES-015) y de los descriptores solo se editan titulo y descripcion;
+- un indicador puede marcarse con `requiresComment`/`requiresEvidence` (RF-IND-005): si estan activos, `POST /api/assignment/[id]/submit` rechaza el envio (`409`) mientras la respuesta de ese indicador no tenga comentario y/o evidencia, e informa el detalle en `missing`;
 - eliminar exige ir de abajo hacia arriba: un registro con hijos o usado en asignaciones responde `409`;
 - cada operacion exitosa registra una entrada en `InstrumentEditLog` via `lib/instrumentLog.ts` (best-effort: un fallo al loguear no revierte el CRUD).
 
@@ -129,7 +130,7 @@ Flujo:
 `POST`: envia la actividad (cualquier usuario asignado via `UserAssignTo`).
 
 - valida ownership (`403`);
-- valida que todos los indicadores tengan respuesta (`409` si estan incompletos);
+- valida que todos los indicadores tengan respuesta y que los marcados `requiresComment`/`requiresEvidence` tengan ese dato (RF-IND-005); si falta algo responde `409` con `missing: [{ indicatorCode, missingResponse, missingComment, missingEvidence }]`;
 - marca la asignacion como `ENVIADO` y registra `submittedAt` (fecha real de envio; distinta de `submissionDate`, que es la fecha limite).
 
 ### `api/assignment/[id]/evaluators`

@@ -203,6 +203,23 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
 
             if (!response.ok) {
                 if (response.status === 409) {
+                    const body = await response.json().catch(() => null);
+                    const missing: Array<{ indicatorCode: string; missingResponse: boolean; missingComment: boolean; missingEvidence: boolean }> = body?.missing ?? [];
+
+                    if (missing.length > 0) {
+                        const details = missing.map((item) => {
+                            if (item.missingResponse) return `${item.indicatorCode}: sin responder`;
+                            const parts = [];
+                            if (item.missingComment) parts.push("falta comentario");
+                            if (item.missingEvidence) parts.push("falta evidencia");
+                            return `${item.indicatorCode}: ${parts.join(" y ")}`;
+                        });
+                        return {
+                            ok: false,
+                            message: `Completa lo siguiente antes de enviar: ${details.join("; ")}.`,
+                        };
+                    }
+
                     return { ok: false, message: "Responde todos los indicadores antes de enviar la actividad." };
                 }
 

@@ -30,6 +30,8 @@ interface ReviewIndicator {
     code: string;
     description: string;
     justification?: string | null;
+    requiresComment?: boolean;
+    requiresEvidence?: boolean;
     descriptors: ReviewDescriptor[];
     response: ReviewResponse | null;
 }
@@ -459,6 +461,16 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
                                             ) : (
                                                 <span className="inline-flex rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-semibold text-zinc-500">
                                                     Sin respuesta
+                                                </span>
+                                            )}
+                                            {indicator.requiresComment && (
+                                                <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                                                    Comentario obligatorio
+                                                </span>
+                                            )}
+                                            {indicator.requiresEvidence && (
+                                                <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                                                    Evidencia obligatoria
                                                 </span>
                                             )}
                                         </div>

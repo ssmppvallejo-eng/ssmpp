@@ -13,13 +13,26 @@ export interface UpdateAssignmentData {
     userIds?: number[];
 }
 
+export interface MissingRequirement {
+    indicatorCode: string;
+    missingResponse: boolean;
+    missingComment: boolean;
+    missingEvidence: boolean;
+}
+
+export interface AssignmentCompletion {
+    totalIndicators: number;
+    answeredIndicators: number;
+    missing: MissingRequirement[];
+}
+
 export interface IAssignmentRepository {
     saveDescriptorResponse(data: SaveAssignmentResponseDTO): Promise<any>;
     findAssignmentById(id: number): Promise<any | null>;
     findStudentAssignments(userId: number): Promise<any[]>;
     verifyOwnership(assignmentId: number, userId: number): Promise<boolean>;
     verifyIndicatorInAssignment(assignmentIndicatorId: number, assignmentId: number): Promise<boolean>;
-    getAssignmentCompletion(assignmentId: number): Promise<{ totalIndicators: number; answeredIndicators: number }>;
+    getAssignmentCompletion(assignmentId: number): Promise<AssignmentCompletion>;
     submitAssignment(assignmentId: number): Promise<any>;
     getAssignmentStatus(assignmentId: number): Promise<{ id: number; status: string } | null>;
     updateStatus(assignmentId: number, status: string): Promise<any>;

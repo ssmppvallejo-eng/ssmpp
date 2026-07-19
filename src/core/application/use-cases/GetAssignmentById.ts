@@ -64,6 +64,8 @@ export class GetAssignmentByIdUseCase {
                 description: indicator.description,
                 descriptors: indicator.descriptors,
                 savedResponse,
+                requiresComment: indicator.requiresComment,
+                requiresEvidence: indicator.requiresEvidence,
             });
 
             return acc;

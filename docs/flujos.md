@@ -100,8 +100,9 @@ Flujo actual:
 3. Al terminar, el usuario envia la actividad con `POST /api/assignment/:id/submit`.
 4. `SubmitStudentAssignmentUseCase` valida ownership y completitud: si hay indicadores sin responder, responde `409`.
 5. Si todo esta completo, la asignacion pasa a estado `ENVIADO` y se registra `submittedAt` con el momento real del envio (distinto de `submissionDate`, que es la fecha limite fijada al crear la asignacion).
-
 6. Con un descriptor seleccionado, el evaluado puede adjuntar evidencia documental (`POST /api/assignment/:id/evidence`, PDF/imagen/ofimatica, max. 5 MB); el archivo se guarda en la BD y se descarga via `/api/evidence/:id`.
+
+RF-IND-005 ("cuando el indicador lo requiera, el usuario debera proporcionar un comentario y/o adjuntar evidencia"): desde el instrumento (`/app/admin/instrument`), el administrador marca por indicador si el comentario y/o la evidencia son obligatorios (`Indicator.requiresComment`/`requiresEvidence`). La pantalla de respuesta muestra esos requisitos con una etiqueta ambar y un asterisco; el envio (`submit`) los valida y, si falta alguno, responde `409` con el detalle por indicador (`missing`), que el frontend traduce a un mensaje especifico.
 
 ## 9. Revision (evaluador)
 

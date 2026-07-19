@@ -13,6 +13,8 @@ const CreateIndicatorSchema = z.object({
     code: z.string().min(1),
     description: z.string().min(1),
     justification: z.string().optional().nullable(),
+    requiresComment: z.boolean().optional(),
+    requiresEvidence: z.boolean().optional(),
     descriptors: z.array(z.object({
         title: z.string().min(1),
         description: z.string().min(1),
@@ -37,6 +39,8 @@ export async function POST(request: NextRequest) {
                 code: body.code,
                 description: body.description,
                 justification: body.justification ?? null,
+                requiresComment: body.requiresComment ?? false,
+                requiresEvidence: body.requiresEvidence ?? false,
                 descriptors: {
                     create: body.descriptors.map((descriptor, index) => ({
                         title: descriptor.title,

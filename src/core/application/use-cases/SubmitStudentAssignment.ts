@@ -10,8 +10,10 @@ export class SubmitStudentAssignmentUseCase {
         }
 
         const completion = await this.assignmentRepository.getAssignmentCompletion(assignmentId);
-        if (completion.totalIndicators === 0 || completion.answeredIndicators < completion.totalIndicators) {
-            throw new Error("INCOMPLETE: Assignment has unanswered indicators");
+        if (completion.totalIndicators === 0 || completion.missing.length > 0) {
+            const error: any = new Error("INCOMPLETE: Assignment has unanswered indicators or missing required comment/evidence");
+            error.missing = completion.missing;
+            throw error;
         }
 
         return await this.assignmentRepository.submitAssignment(assignmentId);

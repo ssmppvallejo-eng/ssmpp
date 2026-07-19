@@ -92,10 +92,20 @@ export default function Indicator({ ind }: IndicatorProps) {
     return (
         <article className="px-5 py-6">
             <div className="flex flex-col gap-4">
-                <div>
+                <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex rounded-md bg-sky-50 px-3 py-1.5 text-sm font-semibold text-sky-800">
                         Indicador {ind.code}
                     </span>
+                    {ind.requiresComment && (
+                        <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                            Comentario obligatorio
+                        </span>
+                    )}
+                    {ind.requiresEvidence && (
+                        <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                            Evidencia obligatoria
+                        </span>
+                    )}
                 </div>
 
                 <section>
@@ -134,6 +144,7 @@ export default function Indicator({ ind }: IndicatorProps) {
                             <span className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-950">
                                 <FiMessageSquare className="size-4 text-sky-700" />
                                 Comentario
+                                {ind.requiresComment && <span className="text-red-600">*</span>}
                             </span>
                             <p className="mt-2 text-sm leading-6 text-zinc-600">
                                 En su opinión, ¿cuáles son los elementos fundamentales que deben considerarse para definir la trayectoria académica en el programa de posgrado que coordina?
@@ -151,10 +162,13 @@ export default function Indicator({ ind }: IndicatorProps) {
                             <span className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-950">
                                 <FiFileText className="size-4 text-sky-700" />
                                 Evidencia
+                                {ind.requiresEvidence && <span className="text-red-600">*</span>}
                             </span>
                             <p className="mt-2 text-sm leading-6 text-zinc-600">
                                 {descriptorState?.descriptorId
-                                    ? "Adjunte un archivo si el indicador lo requiere (PDF, imagen u ofimática, máx. 5 MB)."
+                                    ? ind.requiresEvidence
+                                        ? "Este indicador exige adjuntar un archivo (PDF, imagen u ofimática, máx. 5 MB) antes de poder enviar la evaluación."
+                                        : "Adjunte un archivo si el indicador lo requiere (PDF, imagen u ofimática, máx. 5 MB)."
                                     : "Seleccione primero un descriptor para poder adjuntar evidencia."}
                             </p>
 

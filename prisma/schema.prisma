@@ -72,11 +72,15 @@ model Component {
 }
 
 model Indicator {
-  description   String
-  code          String                @unique
-  justification String?
-  id            Int                   @id @default(autoincrement())
-  judgementId   Int
+  description      String
+  code             String                @unique
+  justification    String?
+  // RF-IND-005: "cuando el indicador lo requiera" el usuario debe dar
+  // comentario y/o evidencia antes de poder enviar la evaluacion.
+  requiresComment  Boolean               @default(false)
+  requiresEvidence Boolean               @default(false)
+  id               Int                   @id @default(autoincrement())
+  judgementId      Int
   assignments AssignmentIndicator[]
   descriptors Descriptor[]
   judgement   Judgement             @relation(fields: [judgementId], references: [id])

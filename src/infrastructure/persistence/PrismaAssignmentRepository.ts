@@ -1,5 +1,5 @@
 import { prisma } from "../../../lib/prisma";
-import { CreateAssignmentData, IAssignmentRepository, UpdateAssignmentData } from "../../core/domain/repository/IAssignmentRepository";
+import { AssignmentCompletion, CreateAssignmentData, IAssignmentRepository, UpdateAssignmentData } from "../../core/domain/repository/IAssignmentRepository";
 import { SaveAssignmentResponseDTO } from "../../core/application/dtos/AssignmentDTO";
 
 export class PrismaAssignmentRepository implements IAssignmentRepository {
@@ -61,6 +61,8 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                                 id: true,
                                 code: true,
                                 description: true,
+                                requiresComment: true,
+                                requiresEvidence: true,
                                 descriptors: {
                                     select: {
                                         id: true,
@@ -139,22 +141,51 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
         return !!isMyActivity;
     }
 
-    async getAssignmentCompletion(assignmentId: number): Promise<{ totalIndicators: number; answeredIndicators: number }> {
+    async getAssignmentCompletion(assignmentId: number): Promise<AssignmentCompletion> {
+        // RF-IND-005: ademas de tener un descriptor seleccionado, un indicador
+        // marcado como requiresComment/requiresEvidence exige esos datos antes
+        // de poder enviar la evaluacion.
         const assignmentIndicators = await prisma.assignmentIndicator.findMany({
             where: { assignmentId },
             select: {
-                id: true,
+                indicator: {
+                    select: { code: true, requiresComment: true, requiresEvidence: true },
+                },
                 descriptorAssignments: {
                     where: { complete: true },
-                    select: { assignmentIndicatorId: true },
+                    select: { comment: true, evidenceUrl: true },
                     take: 1,
                 },
             },
         });
 
+        const missing: AssignmentCompletion["missing"] = [];
+        let answeredIndicators = 0;
+
+        for (const item of assignmentIndicators) {
+            const response = item.descriptorAssignments[0];
+            const missingResponse = !response;
+            const missingComment = item.indicator.requiresComment && !response?.comment;
+            const missingEvidence = item.indicator.requiresEvidence && !response?.evidenceUrl;
+
+            if (!missingResponse) {
+                answeredIndicators += 1;
+            }
+
+            if (missingResponse || missingComment || missingEvidence) {
+                missing.push({
+                    indicatorCode: item.indicator.code,
+                    missingResponse,
+                    missingComment: !!missingComment,
+                    missingEvidence: !!missingEvidence,
+                });
+            }
+        }
+
         return {
             totalIndicators: assignmentIndicators.length,
-            answeredIndicators: assignmentIndicators.filter((indicator) => indicator.descriptorAssignments.length > 0).length,
+            answeredIndicators,
+            missing,
         };
     }
 
@@ -343,6 +374,8 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                                 code: true,
                                 description: true,
                                 justification: true,
+                                requiresComment: true,
+                                requiresEvidence: true,
                                 descriptors: {
                                     orderBy: { value: "asc" },
                                     select: {

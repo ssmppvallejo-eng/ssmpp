@@ -42,6 +42,7 @@ Campos importantes:
 - `code`
 - `description`
 - `justification`: justificacion normativa del indicador (leyes y lineamientos que lo sustentan).
+- `requiresComment` / `requiresEvidence`: si estan activos, RF-IND-005 exige ese dato en la respuesta antes de poder enviar la evaluacion (validado en `SubmitStudentAssignmentUseCase`).
 
 Relaciones:
 

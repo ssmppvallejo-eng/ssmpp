@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
                                         code: true,
                                         description: true,
                                         justification: true,
+                                        requiresComment: true,
+                                        requiresEvidence: true,
                                         descriptors: {
                                             orderBy: { value: "asc" },
                                             select: {

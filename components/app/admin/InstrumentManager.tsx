@@ -16,6 +16,8 @@ interface CatalogIndicator {
     code: string;
     description: string;
     justification?: string | null;
+    requiresComment?: boolean;
+    requiresEvidence?: boolean;
     descriptors: CatalogDescriptor[];
 }
 
@@ -130,11 +132,17 @@ export default function InstrumentManager() {
         if (target.kind === "indicator" && target.mode === "create") {
             setValues({
                 code: "", description: "", justification: "",
+                requiresComment: "false", requiresEvidence: "false",
                 d1title: DEFAULT_DESCRIPTOR_TITLES[0], d1desc: "",
                 d2title: DEFAULT_DESCRIPTOR_TITLES[1], d2desc: "",
                 d3title: DEFAULT_DESCRIPTOR_TITLES[2], d3desc: "",
                 ...initial,
             });
+            return;
+        }
+
+        if (target.kind === "indicator" && target.mode === "edit") {
+            setValues({ code: "", description: "", justification: "", requiresComment: "false", requiresEvidence: "false", ...initial });
             return;
         }
 
@@ -163,6 +171,8 @@ export default function InstrumentManager() {
                 code: values.code,
                 description: values.description,
                 justification: values.justification || null,
+                requiresComment: values.requiresComment === "true",
+                requiresEvidence: values.requiresEvidence === "true",
             };
             if (form.mode === "create") {
                 payload.descriptors = [1, 2, 3].map((n) => ({
@@ -434,13 +444,30 @@ export default function InstrumentManager() {
                                                                                         {" — "}
                                                                                         {indicator.description}
                                                                                     </p>
+                                                                                    {(indicator.requiresComment || indicator.requiresEvidence) && (
+                                                                                        <div className="mt-1 flex flex-wrap gap-1.5">
+                                                                                            {indicator.requiresComment && (
+                                                                                                <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                                                                                                    Comentario obligatorio
+                                                                                                </span>
+                                                                                            )}
+                                                                                            {indicator.requiresEvidence && (
+                                                                                                <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                                                                                                    Evidencia obligatoria
+                                                                                                </span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="flex gap-2">
                                                                                     <button
                                                                                         type="button"
                                                                                         onClick={() => openForm(
                                                                                             { kind: "indicator", mode: "edit", entityId: indicator.id, heading: `Editar indicador ${indicator.code}` },
-                                                                                            { code: indicator.code, description: indicator.description, justification: indicator.justification ?? "" }
+                                                                                            {
+                                                                                                code: indicator.code, description: indicator.description, justification: indicator.justification ?? "",
+                                                                                                requiresComment: String(!!indicator.requiresComment), requiresEvidence: String(!!indicator.requiresEvidence),
+                                                                                            }
                                                                                         )}
                                                                                         className={`${actionButton} border-zinc-300 bg-white text-zinc-700 hover:border-sky-700 hover:text-sky-800`}
                                                                                     >
@@ -558,6 +585,35 @@ export default function InstrumentManager() {
                                         className="mt-2 w-full resize-y rounded-md border border-zinc-300 p-3 text-sm leading-6 text-zinc-900"
                                     />
                                 </label>
+                            )}
+
+                            {form.kind === "indicator" && (
+                                <div className="rounded-md border border-amber-200 bg-amber-50 p-4">
+                                    <p className="text-sm font-semibold text-zinc-950">Requisitos para enviar (RF-IND-005)</p>
+                                    <p className="mt-1 text-xs leading-5 text-zinc-600">
+                                        Si se marcan, el evaluado no podrá enviar la actividad sin cumplirlos en este indicador.
+                                    </p>
+                                    <div className="mt-3 flex flex-col gap-2">
+                                        <label className="flex items-center gap-2 text-sm text-zinc-800">
+                                            <input
+                                                type="checkbox"
+                                                checked={values.requiresComment === "true"}
+                                                onChange={(event) => setValue("requiresComment", String(event.target.checked))}
+                                                className="size-4 accent-amber-700"
+                                            />
+                                            Exigir comentario
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm text-zinc-800">
+                                            <input
+                                                type="checkbox"
+                                                checked={values.requiresEvidence === "true"}
+                                                onChange={(event) => setValue("requiresEvidence", String(event.target.checked))}
+                                                className="size-4 accent-amber-700"
+                                            />
+                                            Exigir evidencia documental
+                                        </label>
+                                    </div>
+                                </div>
                             )}
 
                             {form.kind === "indicator" && form.mode === "create" && (

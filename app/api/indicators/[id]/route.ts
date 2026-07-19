@@ -10,6 +10,8 @@ const UpdateIndicatorSchema = z.object({
     code: z.string().min(1).optional(),
     description: z.string().min(1).optional(),
     justification: z.string().optional().nullable(),
+    requiresComment: z.boolean().optional(),
+    requiresEvidence: z.boolean().optional(),
 });
 
 export async function PATCH(

@@ -28,7 +28,8 @@ export async function POST(
 
         if (error.message.includes("INCOMPLETE")) {
             return NextResponse.json({
-                message: "Assignment has unanswered indicators",
+                message: "Assignment has unanswered indicators or missing required comment/evidence",
+                missing: error.missing ?? [],
             }, { status: 409 });
         }
 

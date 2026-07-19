@@ -38,6 +38,8 @@ export class GetAssignmentForReviewUseCase {
                 code: indicator.code,
                 description: indicator.description,
                 justification: indicator.justification,
+                requiresComment: indicator.requiresComment,
+                requiresEvidence: indicator.requiresEvidence,
                 descriptors: indicator.descriptors,
                 response: item.descriptorAssignments?.[0] ?? null,
             });
