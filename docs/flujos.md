@@ -101,9 +101,7 @@ Flujo actual:
 4. `SubmitStudentAssignmentUseCase` valida ownership y completitud: si hay indicadores sin responder, responde `409`.
 5. Si todo esta completo, la asignacion pasa a estado `ENVIADO`.
 
-Pendiente:
-
-- adjuntar evidencia documental (no hay mecanismo de subida de archivos).
+6. Con un descriptor seleccionado, el evaluado puede adjuntar evidencia documental (`POST /api/assignment/:id/evidence`, PDF/imagen/ofimatica, max. 5 MB); el archivo se guarda en la BD y se descarga via `/api/evidence/:id`.
 
 ## 9. Revision (evaluador)
 
@@ -119,4 +117,4 @@ Reglas relacionadas del ciclo de estados (RF-SIS-007):
 - La primera respuesta guardada mueve la asignacion de `PENDIENTE` a `EN_PROCESO`.
 - Despues del envio, el evaluado ya no puede modificar respuestas (`409`).
 
-Pendiente: estado `NO_COMPLETADO` por expiracion de la fecha limite.
+Expiracion: al consultar listados o detalles, las asignaciones `PENDIENTE`/`EN_PROCESO`/`EN_REVISION` cuya fecha limite ya vencio pasan automaticamente a `NO_COMPLETADO` y dejan de aceptar respuestas.

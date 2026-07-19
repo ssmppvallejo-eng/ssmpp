@@ -1,5 +1,5 @@
 import { prisma } from "../../../lib/prisma";
-import { CreateAssignmentData, IAssignmentRepository } from "../../core/domain/repository/IAssignmentRepository";
+import { CreateAssignmentData, IAssignmentRepository, UpdateAssignmentData } from "../../core/domain/repository/IAssignmentRepository";
 import { SaveAssignmentResponseDTO } from "../../core/application/dtos/AssignmentDTO";
 
 export class PrismaAssignmentRepository implements IAssignmentRepository {
@@ -84,6 +84,8 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
                                 descriptorId: true,
                                 valueAssigned: true,
                                 comment: true,
+                                evidenceName: true,
+                                evidenceUrl: true,
                             }
                         }
                     }
@@ -206,6 +208,70 @@ export class PrismaAssignmentRepository implements IAssignmentRepository {
             total: assignmentIndicators.length,
             judged: assignmentIndicators.filter((indicator) => indicator.descriptorAssignments.length > 0).length,
         };
+    }
+
+    async updateAssignment(assignmentId: number, data: UpdateAssignmentData): Promise<any> {
+        const operations: any[] = [];
+
+        if (data.userIds) {
+            operations.push(
+                prisma.userAssignTo.deleteMany({ where: { assignmentId } }),
+                prisma.userAssignTo.createMany({
+                    data: data.userIds.map((userId) => ({ assignmentId, userId })),
+                }),
+            );
+        }
+
+        operations.push(
+            prisma.assignment.update({
+                where: { id: assignmentId },
+                data: {
+                    ...(data.dueDate !== undefined && { submissionDate: data.dueDate }),
+                },
+                include: {
+                    dimension: { select: { code: true, title: true } },
+                    assignedUsers: { select: { user: { select: { id: true, name: true, email: true } } } },
+                },
+            }),
+        );
+
+        const results = await prisma.$transaction(operations);
+        return results[results.length - 1];
+    }
+
+    async deleteAssignment(assignmentId: number): Promise<void> {
+        // Se recolectan los archivos de evidencia referenciados para borrarlos
+        // junto con la asignacion.
+        const responses = await prisma.assignmentIndicatorDescriptor.findMany({
+            where: { assignmentIndicator: { assignmentId } },
+            select: { evidenceUrl: true },
+        });
+
+        const evidenceIds = responses
+            .map((response) => response.evidenceUrl?.match(/^\/api\/evidence\/(\d+)$/)?.[1])
+            .filter((id): id is string => !!id)
+            .map(Number);
+
+        await prisma.$transaction([
+            prisma.assignmentIndicatorDescriptor.deleteMany({ where: { assignmentIndicator: { assignmentId } } }),
+            prisma.assignmentIndicator.deleteMany({ where: { assignmentId } }),
+            prisma.userAssignTo.deleteMany({ where: { assignmentId } }),
+            prisma.assignment.delete({ where: { id: assignmentId } }),
+            ...(evidenceIds.length ? [prisma.evidenceFile.deleteMany({ where: { id: { in: evidenceIds } } })] : []),
+        ]);
+    }
+
+    async expireOverdueAssignments(): Promise<number> {
+        // RF-SIS-007: las evaluaciones no enviadas ni completadas cuya fecha
+        // limite ya vencio pasan a NO_COMPLETADO.
+        const result = await prisma.assignment.updateMany({
+            where: {
+                submissionDate: { lt: new Date() },
+                status: { in: ["PENDIENTE", "EN_PROCESO", "EN_REVISION"] },
+            },
+            data: { status: "NO_COMPLETADO" },
+        });
+        return result.count;
     }
 
     async findAllWithDetails(): Promise<any[]> {

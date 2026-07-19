@@ -28,14 +28,15 @@ export default function Accounts() {
 
           <div className="relative max-w-2xl">
             <p className="text-sm font-semibold uppercase text-sky-300">
-              Sistema de seguimiento académico
+              SICVPP-BUAP
             </p>
             <h1 className="mt-5 text-5xl font-semibold leading-tight">
-              Acceso seguro para actividades de evaluación
+              Evaluación de la pertinencia de los programas de posgrado
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-300">
-              Ingresa con tu cuenta institucional para consultar actividades,
-              responder rúbricas y dar seguimiento a evidencias académicas.
+              Sistema de Indicadores Contextualizados para Valorar la Pertinencia de los
+              Programas de Posgrado de la BUAP. Ingresa con tu cuenta para responder,
+              revisar y dar seguimiento a las evaluaciones.
             </p>
           </div>
 
@@ -60,7 +61,7 @@ export default function Accounts() {
             <div className="ml-auto flex items-center gap-3">
               <Image src="/logo.svg" alt="Logo" width={48} height={48} className="size-12" />
               <span className="hidden text-sm font-semibold leading-5 text-zinc-950 sm:block">
-                SSMPP
+                SICVPP-BUAP
               </span>
             </div>
           </div>
@@ -95,7 +96,7 @@ export default function Accounts() {
           </div>
 
           <p className="text-center text-xs text-zinc-500">
-            © 2026 Sistema de seguimiento académico.
+            © 2026 SICVPP-BUAP · Benemérita Universidad Autónoma de Puebla.
           </p>
         </article>
       </section>

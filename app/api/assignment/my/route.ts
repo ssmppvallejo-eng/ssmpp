@@ -1,11 +1,16 @@
 import { prisma } from '../../../../lib/prisma';
 import { requireApprovedSession } from '../../../../lib/apiAuth';
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaAssignmentRepository } from '../../../../src/infrastructure/persistence/PrismaAssignmentRepository';
+
+const repository = new PrismaAssignmentRepository();
 
 export async function GET(request: NextRequest) {
     try {
         const { session, error } = await requireApprovedSession();
         if (error) return error;
+
+        await repository.expireOverdueAssignments();
 
         // La pertenencia se define por UserAssignTo, sin importar el rol:
         // quien fue asignado a una actividad puede verla.

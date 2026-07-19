@@ -56,6 +56,7 @@ const STATUS_LABELS: Record<string, string> = {
     ENVIADO: "Enviado",
     EN_REVISION: "En revisión",
     COMPLETADO: "Completado",
+    NO_COMPLETADO: "No completado",
 };
 
 const ACHIEVEMENT_LABELS = ["No logrado", "En proceso", "Plenamente logrado"];

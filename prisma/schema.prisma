@@ -147,6 +147,14 @@ model UserAssignTo {
   @@id([assignmentId, userId])
 }
 
+model EvidenceFile {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
 model UserPostgraduate {
   userId         Int
   postgraduateId Int
@@ -171,6 +179,7 @@ enum IndicatorStatus {
   ENVIADO
   EN_REVISION
   COMPLETADO
+  NO_COMPLETADO
 }
 
 enum Level {

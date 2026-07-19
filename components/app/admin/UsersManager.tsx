@@ -137,6 +137,17 @@ export default function UsersManager() {
 
     const pendingCount = users.filter((user) => user.accessStatus === "PENDIENTE").length;
 
+    const [filterRole, setFilterRole] = useState("");
+    const [filterStatus, setFilterStatus] = useState("");
+    const [filterPostgraduate, setFilterPostgraduate] = useState("");
+
+    const filteredUsers = users.filter((user) => {
+        if (filterRole && user.role !== filterRole) return false;
+        if (filterStatus && user.accessStatus !== filterStatus) return false;
+        if (filterPostgraduate && !(user.postgraduates ?? []).some((entry) => entry.postgraduate.id === Number(filterPostgraduate))) return false;
+        return true;
+    });
+
     return (
         <div className="mx-auto w-full max-w-7xl px-5 py-6 sm:px-8 lg:px-10">
             <header className="mb-8 flex flex-col gap-4 border-b border-zinc-200 pb-6 md:flex-row md:items-end md:justify-between">
@@ -161,6 +172,40 @@ export default function UsersManager() {
                 </div>
             )}
 
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+                <select
+                    value={filterRole}
+                    onChange={(event) => setFilterRole(event.target.value)}
+                    className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-700"
+                >
+                    <option value="">Todos los roles</option>
+                    {ROLES.map((role) => <option key={role} value={role}>{role}</option>)}
+                </select>
+                <select
+                    value={filterStatus}
+                    onChange={(event) => setFilterStatus(event.target.value)}
+                    className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-700"
+                >
+                    <option value="">Todos los estados</option>
+                    {Object.entries(STATUS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+                {postgraduates.length > 0 && (
+                    <select
+                        value={filterPostgraduate}
+                        onChange={(event) => setFilterPostgraduate(event.target.value)}
+                        className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-700"
+                    >
+                        <option value="">Todos los posgrados</option>
+                        {postgraduates.map((postgraduate) => (
+                            <option key={postgraduate.id} value={postgraduate.id}>{postgraduate.title}</option>
+                        ))}
+                    </select>
+                )}
+                {(filterRole || filterStatus || filterPostgraduate) && (
+                    <p className="text-xs text-zinc-500">{filteredUsers.length} de {users.length} usuarios</p>
+                )}
+            </div>
+
             {loading ? (
                 <p className="text-sm text-zinc-500">Cargando usuarios...</p>
             ) : (
@@ -176,7 +221,7 @@ export default function UsersManager() {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => {
+                            {filteredUsers.map((user) => {
                                 const isSelf = user.id === session?.user.id;
                                 const saving = savingUserId === user.id;
 

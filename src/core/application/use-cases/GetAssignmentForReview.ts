@@ -9,6 +9,7 @@ export class GetAssignmentForReviewUseCase {
     constructor(private readonly assignmentRepository: IAssignmentRepository) {}
 
     async execute(assignmentId: number) {
+        await this.assignmentRepository.expireOverdueAssignments();
         const dbAssignment = await this.assignmentRepository.findAssignmentForReview(assignmentId);
 
         if (!dbAssignment) {

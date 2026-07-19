@@ -99,6 +99,22 @@ Flujo:
 
 `POST` (solo `ESTUDIANTE`): guarda la respuesta de un indicador (descriptor seleccionado y comentario). Body validado con Zod (`SaveAssignmentResponseSchema`). Hace upsert en `AssignmentIndicatorDescriptor` mediante `SaveStudentResponseUseCase`.
 
+`PATCH` (solo `ADMINISTRADOR`): edita la fecha limite (`dueDate`) y/o reemplaza los usuarios asignados (`userIds`, deben estar aprobados).
+
+`DELETE` (solo `ADMINISTRADOR`): elimina la asignacion con sus respuestas, juicios, vinculos y archivos de evidencia.
+
+### `api/assignment/[id]/evidence`
+
+`POST` (miembro de la asignacion, con la actividad en `PENDIENTE`/`EN_PROCESO`): sube evidencia documental (RF-IND-005) como `multipart/form-data` (`file` + `assignmentIndicatorId`). Tipos permitidos: PDF, PNG, JPG, DOC(X), XLS(X); maximo 5 MB. Requiere que el indicador ya tenga descriptor seleccionado. El archivo se guarda en la BD (`EvidenceFile`) y reemplaza a la evidencia anterior si existia.
+
+### `api/evidence/[id]`
+
+`GET`: descarga una evidencia. Permitido para administradores/coordinadores y para cualquier usuario asignado a la evaluacion correspondiente.
+
+### `api/dashboard`
+
+`GET` (solo `ADMINISTRADOR`): metricas agregadas — asignaciones por estado, usuarios aprobados por rol, y promedio de logro (autoevaluacion y juicio del evaluador) por dimension y por indicador.
+
 ### `api/assignment/[id]/review`
 
 `GET` (solo `ADMINISTRADOR` y `COORDINADOR`): vista de supervision (RF-ASIG-010). Devuelve la jerarquia completa de la asignacion con, por indicador: justificacion normativa, los 3 descriptores, la respuesta capturada (descriptor, comentario, evidencia) y el juicio de valor del evaluador cuando exista, ademas de progreso, responsables y fechas. No exige pertenencia.

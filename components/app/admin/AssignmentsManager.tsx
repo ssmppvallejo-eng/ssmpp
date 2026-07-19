@@ -22,6 +22,7 @@ const STATUS_STYLES: Record<string, string> = {
     ENVIADO: "bg-sky-50 text-sky-800 border-sky-200",
     EN_REVISION: "bg-violet-50 text-violet-800 border-violet-200",
     COMPLETADO: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    NO_COMPLETADO: "bg-red-50 text-red-800 border-red-200",
 };
 
 function formatDate(value?: string | null) {
@@ -29,10 +30,21 @@ function formatDate(value?: string | null) {
     return new Date(value).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+const STATUS_FILTER_LABELS: Record<string, string> = {
+    PENDIENTE: "Pendiente",
+    EN_PROCESO: "En proceso",
+    ENVIADO: "Enviado",
+    EN_REVISION: "En revisión",
+    COMPLETADO: "Completado",
+    NO_COMPLETADO: "No completado",
+};
+
 export default function AssignmentsManager() {
     const [assignments, setAssignments] = useState<AssignmentRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [filterStatus, setFilterStatus] = useState("");
+    const [filterDimension, setFilterDimension] = useState("");
 
     useEffect(() => {
         let cancelled = false;
@@ -84,6 +96,29 @@ export default function AssignmentsManager() {
                 </div>
             )}
 
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+                <select
+                    value={filterStatus}
+                    onChange={(event) => setFilterStatus(event.target.value)}
+                    className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-700"
+                >
+                    <option value="">Todos los estados</option>
+                    {Object.entries(STATUS_FILTER_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                    ))}
+                </select>
+                <select
+                    value={filterDimension}
+                    onChange={(event) => setFilterDimension(event.target.value)}
+                    className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-700"
+                >
+                    <option value="">Todas las dimensiones</option>
+                    {[...new Set(assignments.map((assignment) => assignment.dimension.code))].sort().map((code) => (
+                        <option key={code} value={code}>{code}</option>
+                    ))}
+                </select>
+            </div>
+
             {loading ? (
                 <p className="text-sm text-zinc-500">Cargando asignaciones...</p>
             ) : assignments.length === 0 ? (
@@ -104,7 +139,12 @@ export default function AssignmentsManager() {
                             </tr>
                         </thead>
                         <tbody>
-                            {assignments.map((assignment) => (
+                            {assignments
+                                .filter((assignment) =>
+                                    (!filterStatus || assignment.status === filterStatus) &&
+                                    (!filterDimension || assignment.dimension.code === filterDimension)
+                                )
+                                .map((assignment) => (
                                 <tr key={assignment.id} className="border-b border-zinc-100 last:border-b-0 transition hover:bg-zinc-50">
                                     <td className="px-4 py-3">
                                         <Link href={`/app/admin/assignments/${assignment.id}`} className="group block">
