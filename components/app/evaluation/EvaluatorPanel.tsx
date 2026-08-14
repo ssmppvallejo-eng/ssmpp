@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiBookOpen, FiCheck, FiCheckCircle, FiFileText, FiMessageSquare } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface ReviewDescriptor {
     id: number;
@@ -167,7 +168,7 @@ export default function EvaluatorPanel({ assignmentId }: { assignmentId: string 
     if (loading) {
         return (
             <div className="mx-auto w-full max-w-6xl px-5 py-6 sm:px-8 lg:px-10">
-                <p className="text-sm text-zinc-500">Cargando evaluación...</p>
+                <Spinner label="Cargando evaluación…" className="min-h-48 justify-center" />
             </div>
         );
     }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface AssignmentRow {
     id: number;
@@ -121,7 +122,7 @@ export default function AssignmentsManager() {
             </div>
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando asignaciones...</p>
+                <Spinner label="Cargando asignaciones…" className="min-h-48 justify-center" />
             ) : assignments.length === 0 ? (
                 <div className="border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
                     <p className="text-sm text-zinc-600">Todavía no hay asignaciones. Crea la primera con el botón de arriba.</p>

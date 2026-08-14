@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface TemplateRow {
     id: number;
@@ -202,7 +203,7 @@ export default function TemplatesManager() {
             )}
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando plantillas...</p>
+                <Spinner label="Cargando plantillas…" className="min-h-48 justify-center" />
             ) : templates.length === 0 ? (
                 <div className="border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
                     <p className="text-sm text-zinc-600">Todavía no hay plantillas registradas.</p>

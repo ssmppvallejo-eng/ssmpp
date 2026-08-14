@@ -8,6 +8,7 @@ import Judgement from '../../../../components/app/activities/Judgement';
 import EvaluatorPanel from '../../../../components/app/evaluation/EvaluatorPanel';
 import { FiArrowLeft, FiClock, FiSave, FiSend } from "react-icons/fi";
 import Link from "next/link";
+import Spinner from "../../../../components/app/Spinner";
 
 export default  function AssignmentPage () {
     const params = useParams();
@@ -71,6 +72,7 @@ export default  function AssignmentPage () {
 
             {loadingActivity && (
                 <section className="rounded-md border border-zinc-200 bg-white p-6">
+                    <Spinner label="Cargando actividad…" className="mb-6 justify-center" />
                     <div className="h-5 w-32 animate-pulse rounded bg-zinc-200" />
                     <div className="mt-5 h-9 w-3/4 animate-pulse rounded bg-zinc-200" />
                     <div className="mt-4 h-5 w-1/2 animate-pulse rounded bg-zinc-100" />

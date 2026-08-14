@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Spinner from "../Spinner";
 
 interface Summary {
     code: string;
@@ -86,7 +87,7 @@ export default function DashboardManager() {
     if (loading) {
         return (
             <div className="mx-auto w-full max-w-7xl px-5 py-6 sm:px-8 lg:px-10">
-                <p className="text-sm text-zinc-500">Cargando dashboard...</p>
+                <Spinner label="Cargando dashboard…" className="min-h-48 justify-center" />
             </div>
         );
     }

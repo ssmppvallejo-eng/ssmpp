@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FiArrowLeft, FiPrinter } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface ReportDescriptor {
     id: number;
@@ -165,7 +166,7 @@ export default function AssignmentReport({ assignmentId }: { assignmentId: strin
     if (loading) {
         return (
             <div className="mx-auto w-full max-w-5xl px-5 py-6 sm:px-8">
-                <p className="text-sm text-zinc-500">Generando reporte...</p>
+                <Spinner label="Generando reporte…" className="min-h-48 justify-center" />
             </div>
         );
     }

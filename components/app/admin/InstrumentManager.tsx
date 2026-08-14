@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FiChevronDown, FiChevronRight, FiClock, FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface CatalogDescriptor {
     id: number;
@@ -286,7 +287,7 @@ export default function InstrumentManager() {
             )}
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando instrumento...</p>
+                <Spinner label="Cargando instrumento…" className="min-h-48 justify-center" />
             ) : (
                 <div className="flex flex-col gap-4">
                     {dimensions.map((dimension) => {

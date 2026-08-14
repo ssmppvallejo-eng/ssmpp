@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiCheck } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface CatalogIndicator {
     id: number;
@@ -196,7 +197,7 @@ export default function AssignmentCreator() {
             )}
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando catálogo...</p>
+                <Spinner label="Cargando catálogo…" className="min-h-48 justify-center" />
             ) : (
                 <div className="flex flex-col gap-8">
                     <section>

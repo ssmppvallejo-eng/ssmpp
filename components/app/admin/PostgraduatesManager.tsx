@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface PostgraduateRow {
     id: number;
@@ -150,7 +151,7 @@ export default function PostgraduatesManager() {
             )}
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando posgrados...</p>
+                <Spinner label="Cargando posgrados…" className="min-h-48 justify-center" />
             ) : postgraduates.length === 0 ? (
                 <div className="border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
                     <p className="text-sm text-zinc-600">Todavía no hay posgrados registrados.</p>

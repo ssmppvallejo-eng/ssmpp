@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FiBookOpen, FiCheck, FiUser, FiX } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 type AccessStatus = "PENDIENTE" | "APROBADO" | "RECHAZADO";
 
@@ -207,7 +208,7 @@ export default function UsersManager() {
             </div>
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando usuarios...</p>
+                <Spinner label="Cargando usuarios…" className="min-h-48 justify-center" />
             ) : (
                 <div className="overflow-x-auto border border-zinc-200 bg-white">
                     <table className="w-full min-w-[720px] text-left text-sm">

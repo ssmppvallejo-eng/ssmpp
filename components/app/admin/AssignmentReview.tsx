@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { FiArrowLeft, FiBookOpen, FiCheckCircle, FiEdit2, FiFileText, FiMessageSquare, FiPrinter, FiTrash2, FiUser, FiUserPlus, FiX } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface ReviewDescriptor {
     id: number;
@@ -259,7 +260,7 @@ export default function AssignmentReview({ assignmentId }: { assignmentId: strin
     if (loading) {
         return (
             <div className="mx-auto w-full max-w-6xl px-5 py-6 sm:px-8 lg:px-10">
-                <p className="text-sm text-zinc-500">Cargando detalle...</p>
+                <Spinner label="Cargando detalle de asignación…" className="min-h-48 justify-center" />
             </div>
         );
     }

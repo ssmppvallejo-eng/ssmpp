@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FiArrowLeft, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import Spinner from "../Spinner";
 
 interface LogEntry {
     id: number;
@@ -146,7 +147,7 @@ export default function InstrumentHistory() {
             )}
 
             {loading ? (
-                <p className="text-sm text-zinc-500">Cargando historial...</p>
+                <Spinner label="Cargando historial…" className="min-h-48 justify-center" />
             ) : !data || data.entries.length === 0 ? (
                 <div className="border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
                     <p className="text-sm text-zinc-600">Sin registros todavía.</p>
