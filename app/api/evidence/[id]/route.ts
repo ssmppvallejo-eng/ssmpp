@@ -54,6 +54,7 @@ export async function GET(
                 "Content-Type": evidence.mimeType,
                 "Content-Disposition": `inline; filename="${encodeURIComponent(evidence.filename)}"`,
                 "Cache-Control": "private, max-age=3600",
+                "X-Content-Type-Options": "nosniff",
             },
         });
 
@@ -61,7 +62,7 @@ export async function GET(
         console.error("Error at fetching evidence:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

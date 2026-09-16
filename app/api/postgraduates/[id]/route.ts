@@ -43,7 +43,7 @@ export async function PATCH(
         console.error("Error at updating postgraduate:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }
@@ -79,7 +79,7 @@ export async function DELETE(
         console.error("Error at deleting postgraduate:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

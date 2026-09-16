@@ -44,7 +44,7 @@ export async function POST(
         console.error("Error at saving judgement:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

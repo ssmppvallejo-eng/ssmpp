@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
         console.error("Error at fetching dimensions:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         console.error("Error at creating dimension:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

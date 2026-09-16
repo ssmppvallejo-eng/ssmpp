@@ -35,6 +35,7 @@ docs/               Documentacion general del sistema.
 - [Componentes](./components/README.md)
 - [Providers](./providers/README.md)
 - [Prisma](./prisma/README.md)
+- [Despliegue a produccion](./docs/despliegue-produccion.md)
 
 ## Stack tecnico
 
@@ -48,10 +49,12 @@ docs/               Documentacion general del sistema.
 ## Scripts principales
 
 ```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
+pnpm dev
+pnpm build
+pnpm start
+pnpm lint
+pnpm typecheck
+pnpm check
 ```
 
 ## Lectura rapida
@@ -66,7 +69,7 @@ La aplicacion tiene dos superficies principales:
 - Cualquier cuenta de Google puede iniciar sesion; al hacerlo por primera vez queda registrada con `accessStatus: PENDIENTE`.
 - Solo las cuentas con `accessStatus: APROBADO` pueden entrar a `/app` y consumir la API. Las cuentas pendientes o rechazadas son redirigidas a `/landing/accounts/status`.
 - Un `ADMINISTRADOR` aprueba/rechaza cuentas y asigna roles desde `/app/admin/users`.
-- El primer administrador se siembra manualmente en la base de datos (actualizar `role` a `ADMINISTRADOR` en la tabla `User`).
+- El primer administrador se habilita con `pnpm db:admin correo@dominio --confirm` después de que esa cuenta inicie sesión una vez.
 
 La base de datos esta organizada alrededor de:
 
@@ -78,7 +81,6 @@ La base de datos esta organizada alrededor de:
 
 ## Advertencias actuales
 
-- Los flujos de crear asignaciones, revision del evaluador (juicios de valor) y CRUD de la taxonomia aun no existen.
-- La carga de archivos de evidencia no tiene mecanismo de subida.
-- No hay pruebas automatizadas.
-- El README original de Next.js fue reemplazado por esta guia del proyecto.
+- El seed reemplaza el catálogo y elimina asignaciones; exige confirmación explícita.
+- Las evidencias se guardan en PostgreSQL y deben considerarse en respaldos y capacidad.
+- No hay una suite automatizada de pruebas funcionales.

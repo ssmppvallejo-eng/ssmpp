@@ -51,7 +51,7 @@ export async function GET(
         console.error("Error at fetching assignments:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }
@@ -92,7 +92,7 @@ export async function POST(
         console.error("Error at posting assignments:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }
@@ -131,7 +131,7 @@ export async function PATCH(
         console.error("Error at updating assignment:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }
@@ -162,7 +162,7 @@ export async function DELETE(
         console.error("Error at deleting assignment:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

@@ -63,7 +63,7 @@ export async function PUT(
         console.error("Error at setting user postgraduates:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

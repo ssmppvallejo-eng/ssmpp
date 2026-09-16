@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
         console.error('Error at fetching users: ', error);
         return NextResponse.json({
             error: "Error interno del servidor al obtener usuarios",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

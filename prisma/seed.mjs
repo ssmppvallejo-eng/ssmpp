@@ -16,6 +16,19 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const SEED_CONFIRMATION = "REEMPLAZAR_CATALOGO_Y_ASIGNACIONES";
+
+if (process.env.CONFIRM_DESTRUCTIVE_SEED !== SEED_CONFIRMATION) {
+  console.error(
+    [
+      "Seed cancelado: esta operación elimina asignaciones y reemplaza el catálogo.",
+      "Si realmente deseas continuar, ejecútalo con:",
+      `CONFIRM_DESTRUCTIVE_SEED=${SEED_CONFIRMATION} pnpm db:seed`,
+    ].join("\n"),
+  );
+  process.exit(1);
+}
+
 const DESCRIPTOR_TITLES = ["No logrado", "En proceso", "Plenamente logrado"];
 
 // d: [descriptor 1, descriptor 2, descriptor 3]

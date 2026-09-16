@@ -49,7 +49,7 @@ export async function PATCH(
         console.error("Error at updating descriptor:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         console.error("Error at creating component:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }

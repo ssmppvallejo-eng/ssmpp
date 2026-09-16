@@ -17,6 +17,23 @@ const ALLOWED_TYPES: Record<string, string> = {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
 };
 
+function hasPrefix(bytes: Buffer, prefix: number[]): boolean {
+    return prefix.every((value, index) => bytes[index] === value);
+}
+
+function matchesDeclaredType(bytes: Buffer, mimeType: string): boolean {
+    if (mimeType === "application/pdf") return hasPrefix(bytes, [0x25, 0x50, 0x44, 0x46]);
+    if (mimeType === "image/png") return hasPrefix(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    if (mimeType === "image/jpeg") return hasPrefix(bytes, [0xff, 0xd8, 0xff]);
+
+    const isZip = hasPrefix(bytes, [0x50, 0x4b, 0x03, 0x04]);
+    const isOle = hasPrefix(bytes, [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
+    if (mimeType.includes("openxmlformats-officedocument")) return isZip;
+    if (mimeType === "application/msword" || mimeType === "application/vnd.ms-excel") return isOle;
+
+    return false;
+}
+
 // Adjunta evidencia documental a la respuesta de un indicador (RF-IND-005).
 export async function POST(
     request: NextRequest,
@@ -75,6 +92,11 @@ export async function POST(
         }
 
         const bytes = Buffer.from(await file.arrayBuffer());
+        if (!matchesDeclaredType(bytes, file.type)) {
+            return NextResponse.json({
+                message: "El contenido del archivo no coincide con el tipo declarado",
+            }, { status: 400 });
+        }
 
         const evidence = await prisma.evidenceFile.create({
             data: { filename: file.name, mimeType: file.type, data: bytes },
@@ -104,7 +126,7 @@ export async function POST(
         console.error("Error at uploading evidence:", error);
         return NextResponse.json({
             error: "Error interno del servidor",
-            details: error.message,
+            ...(process.env.NODE_ENV !== "production" && { details: error.message }),
         }, { status: 500 });
     }
 }
