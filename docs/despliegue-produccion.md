@@ -21,7 +21,10 @@ Copia `.env.example` como `.env` únicamente para desarrollo. Nunca confirmes
 `.env` en Git. En Vercel configura por separado Development, Preview y
 Production:
 
-- `DATABASE_URL`: conexión PostgreSQL con pooling y TLS.
+- `DATABASE_URL`: Supabase Transaction pooler (6543) con
+  `pgbouncer=true&connection_limit=1&sslmode=require`, usado por la aplicación.
+- `DIRECT_URL`: Supabase Session pooler (5432) con `sslmode=require`, usado por
+  Prisma CLI para migraciones y tareas administrativas.
 - `GOOGLE_CLIENT_ID`: identificador OAuth de Google.
 - `GOOGLE_CLIENT_SECRET`: secreto OAuth de Google.
 - `NEXTAUTH_URL`: URL pública exacta, por ejemplo `https://ssmpp.example.edu`.
