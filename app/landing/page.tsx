@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Navbar from "../../components/landing/Navbar";
 import {
     FiArrowUpRight,
@@ -383,7 +384,10 @@ export default function Landing() {
                 </div>
                 <div className="mx-auto mt-6 flex max-w-7xl flex-col gap-3 text-xs text-zinc-500 sm:flex-row sm:justify-between">
                     <span>© 2026 José Víctor Manuel Vallejo Córdoba</span>
-                    <span>Aviso de privacidad</span>
+                    <nav className="flex gap-4" aria-label="Información legal">
+                        <Link href="/privacidad" className="hover:text-sky-700">Política de privacidad</Link>
+                        <Link href="/terminos" className="hover:text-sky-700">Términos y condiciones</Link>
+                    </nav>
                 </div>
             </footer>
         </main>
